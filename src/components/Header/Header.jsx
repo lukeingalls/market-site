@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button, Form, FormControl, Nav, Navbar } from 'react-bootstrap';
+// import { Button, Form, FormControl, Navbar } from 'react-bootstrap';
 import AccountDropdown from '../Account/AccountDropdown';
 import './Header.scss';
 
@@ -16,9 +17,9 @@ export default function Header() {
             <Navbar.Toggle aria-controls="header" />
             <Navbar.Collapse id="header">
                 <Nav className="mr-auto">
-                    <Nav.Link className="text-light" href="#home">Home</Nav.Link>
+                    {/* <Nav.Link className="text-light" href="#home">Home</Nav.Link>
                     <Nav.Link className="text-light" href="#features">Features</Nav.Link>
-                    <Nav.Link className="text-light" href="#pricing">Pricing</Nav.Link>
+                    <Nav.Link className="text-light" href="#pricing">Pricing</Nav.Link> */}
                 </Nav>
                 <Form inline>
                     <FormControl

@@ -17,5 +17,10 @@ exports.createUser = functions.auth.user().onCreate((user) => {
     return admin.firestore()
         .collection('users')
         .doc(uid)
-        .set({ uid, displayName, email });
+        .set({
+            author: false,
+            displayName: displayName,
+            email: email,
+            uid: uid,
+        });
 });

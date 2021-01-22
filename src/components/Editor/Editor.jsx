@@ -48,7 +48,8 @@ const MarkButton = ({ format, icon }) => {
     );
 };
 
-export default function DocumentEditor() {
+/* eslint-disable-next-line */
+export const DocumentEditor = React.forwardRef((children, ref) => {
     // TODO: Support multiple cached docs
     const [value, setValue] = useState(JSON.parse(localStorage.getItem('content')) || initialValue);
     const renderElement = useCallback(props => renderCustomElement(props), []);
@@ -56,12 +57,16 @@ export default function DocumentEditor() {
     const editor = useMemo(() => withHistory(withReact(createEditor())), []);
 
     return (
-        <Slate editor={editor} value={value} onChange={(value) => {
-            setValue(value);
-            const content = JSON.stringify(value);
-            // TODO: Support multiple cached docs
-            localStorage.setItem('content', content);
-        }}>
+        <Slate
+            editor={editor}
+            value={value}
+            onChange={(value) => {
+                setValue(value);
+                ref.current = value;
+                const content = JSON.stringify(value);
+                // TODO: Support multiple cached docs
+                localStorage.setItem('content', content);
+            }}>
             <Card>
                 <Card.Header>
                     <MarkButton format="bold" icon="format_bold" />
@@ -95,7 +100,7 @@ export default function DocumentEditor() {
             </Card>
         </Slate>
     );
-}
+});
 
 const initialValue = [
     {

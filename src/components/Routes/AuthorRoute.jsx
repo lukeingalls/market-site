@@ -16,7 +16,7 @@ export default function AuthorRoute({ path, exact, children }) {
         );
     } else {
         return (
-            <Redirect to={routes.default} />
+            <Redirect to={routes.default.get()} />
         );
     }
 }

@@ -65,7 +65,7 @@ export default function AccountDropdown({ className }) {
                     {(userDoc && userDoc.data().author) &&
                         <Dropdown.Item
                             as={Link}
-                            to={routes.newArticle}
+                            to={routes.newArticle.get()}
                         >
                             New Article
                         </Dropdown.Item>

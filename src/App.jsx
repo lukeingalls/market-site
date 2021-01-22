@@ -21,13 +21,13 @@ function App() {
                         }}
                     >
                         <Switch>
-                            <Route path={routes.home} exact>
+                            <Route path={routes.home.value} exact>
                                 <Home />
                             </Route>
-                            <AuthorRoute path={routes.newArticle} exact>
+                            <AuthorRoute path={routes.newArticle.value} exact>
                                 <ArticleWriter />
                             </AuthorRoute>
-                            <Route path="/article">
+                            <Route path={routes.article.value} exact>
                                 <Article />
                             </Route>
                         </Switch>

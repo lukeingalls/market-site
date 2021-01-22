@@ -12,6 +12,10 @@ const app = firebase.initializeApp({
     measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID,
 });
 
+function firestoreTimestamp(date) {
+    return firebase.firestore.Timestamp.fromDate(date);
+}
+
 const auth = app.auth();
 const db = app.firestore();
 if (location.hostname === 'localhost') {
@@ -19,5 +23,5 @@ if (location.hostname === 'localhost') {
     db.useEmulator('localhost', 8080);
     auth.useEmulator('http://localhost:9099');
 }
-export { auth, db };
+export { auth, db, firestoreTimestamp };
 export default app;
