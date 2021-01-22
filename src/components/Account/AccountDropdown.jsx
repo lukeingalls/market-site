@@ -1,8 +1,13 @@
 /* eslint-disable react/prop-types,react/display-name */
-import React from 'react';
-import { Col, Dropdown } from 'react-bootstrap';
+import React, { useState } from 'react';
+import { Button, Dropdown } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../../contexts/FirebaseContext';
+import LoginModal from './LoginModal/LoginModal';
+import '../../styles/btn-block.scss';
 import './AccountDropdown.scss';
+import SignUpModal from './SignUp/SignUpModal';
+import { routes } from '../../routes';
 
 const AccountCircle = React.forwardRef(({ onClick }, ref) => {
     return (
@@ -27,16 +32,72 @@ const AccountCircle = React.forwardRef(({ onClick }, ref) => {
 });
 
 export default function AccountDropdown({ className }) {
-    return (
-        <Dropdown className={className}>
-            <Dropdown.Toggle as={AccountCircle} />
-            <Dropdown.Menu as={Col} md="auto" xs="12" align="right" className="text-center">
-                <Dropdown.Header>Username</Dropdown.Header>
-                <Dropdown.Divider />
-                <Dropdown.Item><Link to="/create-doc">New Article</Link></Dropdown.Item>
-                <Dropdown.Item>Account Info</Dropdown.Item>
-                <Dropdown.Item>Sign Out</Dropdown.Item>
-            </Dropdown.Menu>
-        </Dropdown>
-    );
+    const { currentUser, userDoc, signOut } = useAuth();
+    const [showLogin, setShowLogin] = useState(false);
+    const [showSignUp, setShowSignUp] = useState(false);
+
+    const handleCloseLogin = () => {
+        setShowLogin(false);
+    };
+
+    const handleShowLogin = () => {
+        setShowLogin(true);
+    };
+
+    const handleCloseSignUp = () => {
+        setShowSignUp(false);
+    };
+
+    const handleShowSignUp = () => {
+        setShowSignUp(true);
+    };
+
+    if (currentUser) {
+        return (
+            <Dropdown className={className}>
+                <Dropdown.Toggle as={AccountCircle} />
+                <Dropdown.Menu
+                    align="right"
+                    className="text-center w-sm-100"
+                >
+                    <Dropdown.Header>{ currentUser.email }</Dropdown.Header>
+                    <Dropdown.Divider />
+                    {(userDoc && userDoc.data().author) &&
+                        <Dropdown.Item
+                            as={Link}
+                            to={routes.newArticle}
+                        >
+                            New Article
+                        </Dropdown.Item>
+                    }
+                    <Dropdown.Item>Account Info</Dropdown.Item>
+                    <Dropdown.Item onClick={(e) => {
+                        e.preventDefault();
+                        signOut();
+                    }}>Sign Out</Dropdown.Item>
+                </Dropdown.Menu>
+            </Dropdown>
+        );
+    } else {
+        return (
+            <>
+                <Button
+                    className={`${className} btn-sm-block`}
+                    onClick={ handleShowLogin }
+                    variant="outline-light"
+                >
+                    Sign In
+                </Button>
+                <LoginModal
+                    show={showLogin}
+                    onClose={handleCloseLogin}
+                    onSignUp={handleShowSignUp}
+                />
+                <SignUpModal
+                    show={showSignUp}
+                    onClose={handleCloseSignUp}
+                />
+            </>
+        );
+    }
 }

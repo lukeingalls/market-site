@@ -7,7 +7,7 @@ export default function Header() {
     return (
         <Navbar
             bg="info"
-            className="border-bottom header"
+            className="header"
             expand="md"
             sticky="top"
             variant="dark"
