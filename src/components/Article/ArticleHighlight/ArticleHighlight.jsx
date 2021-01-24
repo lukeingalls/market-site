@@ -1,10 +1,12 @@
 /* eslint-disable */
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Button, Card, Col, Container, Row } from 'react-bootstrap';
 import ArticleViewer from '../ArticleViewer/ArticleViewer';
 import './ArticleHighlight.scss';
 import Label from '../../Label/Label';
+import { Link } from 'react-router-dom';
+import { routes } from '../../../routes';
 
 const Shadow = () => {
     return (
@@ -12,16 +14,22 @@ const Shadow = () => {
     );
 };
 
-const ViewMore = () => {
+const ViewMore = ({articleId}) => {
     return (
-        <Button className="view-more" variant="outline-info">View More</Button>
+        <Button
+            as={Link}
+            className="view-more"
+            to={routes.article.get(articleId)}
+            variant="outline-info"
+        >
+            Read More
+        </Button>
     );
 };
 
-export default function ArticleHighlight() {
-    const [title, setTitle] = useState(localStorage.getItem('title') || 'Sample title');
-    const [subTitle, setSubTitle] = useState(localStorage.getItem('subtitle') || 'Sample subtitle');
-    const [article, setArticle] = useState(JSON.parse(localStorage.getItem('content')) || '');
+export default function ArticleHighlight({ Article }) {
+    const { title, subtitle, content: article } = Article.data();
+    const articleId = Article.id;
 
     return (
         <Container className="article">
@@ -34,11 +42,8 @@ export default function ArticleHighlight() {
                                     {title}
                                 </h1>
                                 <h3 className="article--subtitle">
-                                    {subTitle}
+                                    {subtitle}
                                 </h3>
-                            </Col>
-                            <Col>
-                                Author info
                             </Col>
                         </Row>
                     </Container>
@@ -48,11 +53,11 @@ export default function ArticleHighlight() {
                 </Card.Header>
                 <Card.Body style={{ position: "relative", }}>
                     <ArticleViewer
-                        article={article}
+                        article={JSON.parse(article)}
                         className="highlight"
                     />
                     <Shadow />
-                    <ViewMore />
+                    <ViewMore articleId={articleId} />
                 </Card.Body>
             </Card>
         </Container>

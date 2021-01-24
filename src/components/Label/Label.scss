@@ -10,6 +10,7 @@
     border-radius: 0;
     border-top-left-radius: 10%;
     border-bottom-left-radius: 10%;
+    user-select: none;
 
     &::after {
         content: '';

@@ -20,7 +20,10 @@
         min-height: 270px;
     }
 
-    &__timestamp {
+    &__footer {
+        display: flex;
+        justify-content: space-between;
         font-family: unset;
+        align-items: baseline;
     }
 }

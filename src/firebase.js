@@ -16,6 +16,9 @@ function firestoreTimestamp(date) {
     return firebase.firestore.Timestamp.fromDate(date);
 }
 
+const increment = firebase.firestore.FieldValue.increment(1);
+const decrement = firebase.firestore.FieldValue.increment(-1);
+
 const auth = app.auth();
 const db = app.firestore();
 if (location.hostname === 'localhost') {
@@ -23,5 +26,5 @@ if (location.hostname === 'localhost') {
     db.useEmulator('localhost', 8080);
     auth.useEmulator('http://localhost:9099');
 }
-export { auth, db, firestoreTimestamp };
+export { auth, db, firestoreTimestamp, increment, decrement };
 export default app;

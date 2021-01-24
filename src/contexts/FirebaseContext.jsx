@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { auth, db, firestoreTimestamp } from '../firebase';
+import { auth, db, firestoreTimestamp, increment } from '../firebase';
 import PropTypes from 'prop-types';
+import Loading from '../components/Loading/Loading';
 
 const Firebase = React.createContext();
 
@@ -12,6 +13,7 @@ export function FirebaseProvider({ children }) {
     const [currentUser, setCurrentUser] = useState();
     const [userDoc, setUserDoc] = useState();
     const [loading, setLoading] = useState(true);
+    // const [authLoading, setAuthLoading] = useState(true);
 
     const usersRef = db.collection('users');
     const articlesRef = db.collection('articles');
@@ -21,7 +23,7 @@ export function FirebaseProvider({ children }) {
             .doc(articleId)
             .get();
     }
-    
+
     function getNewestArticles(limit = 3) {
         return articlesRef
             .orderBy('created', 'desc')
@@ -29,9 +31,33 @@ export function FirebaseProvider({ children }) {
             .get();
     }
 
+    function getReaction(articleId) {
+        return usersRef
+            .doc(currentUser.uid)
+            .collection('reactions')
+            .doc(articleId)
+            .get();
+    }
+
+    function getUser(uid) {
+        return usersRef
+            .doc(uid)
+            .get();
+    }
+
+    // TODO: make this work with time constraint
+    function getTopArticles(limit = 3) {
+        let weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        return articlesRef
+            .orderBy('views', 'desc')
+            .limit(limit)
+            .get();
+    }
+
     function setArticle(authorId, content, title, subtitle = '') {
         const now = firestoreTimestamp(new Date());
-        
+
         return articlesRef
             .add({
                 authorId: authorId,
@@ -43,70 +69,121 @@ export function FirebaseProvider({ children }) {
                 views: 0,
             });
     }
-    
+
+    function setView(articleId) {
+        const now = firestoreTimestamp(new Date());
+        const batch = db.batch();
+        const viewRef = userDoc.ref.collection('views').doc(articleId);
+        const articleRef = articlesRef.doc(articleId);
+        return viewRef.get()
+            .then((value) => {
+                if (value.exists) {
+                    return viewRef
+                        .set({
+                            lastViewed: now,
+                            numViews: increment,
+                        }, { merge: true });
+                } else {
+                    batch.set(viewRef, {
+                        lastViewed: now,
+                        numViews: 1,
+                    });
+                    batch.set(articleRef, {
+                        views: increment,
+                    }, { merge: true });
+                    return batch.commit();
+                }
+            });
+    }
+
+    function updateProfile(updates) {
+        return userDoc.ref
+            .update(
+                updates
+            );
+    }
+
+    function updateReaction(articleId, reaction) {
+        return usersRef
+            .doc(currentUser.uid)
+            .collection('reactions')
+            .doc(articleId)
+            .set({
+                reaction: reaction,
+            });
+    }
+
     function login(email, password) {
         return auth.signInWithEmailAndPassword(email, password);
     }
-    
+
     function signOut() {
         return auth.signOut();
     }
-    
+
     function signup(email, password) {
         return auth.createUserWithEmailAndPassword(email, password);
     }
-    
-    useEffect(() => {
-        const unsubscribe = auth.onAuthStateChanged((user) => {
-            setCurrentUser(user);
-            setLoading(false);
-        });
-        
-        return unsubscribe;
-    }, []);
-    
+
     useEffect(() => {
         let mounted = true;
-        if (currentUser) {
-            usersRef.doc(String(currentUser.uid)).get()
-                .then((value) => {
-                    if (mounted) {
-                        if (value.exists) {
-                            setUserDoc(value);
-                        } else {
-                            setUserDoc();
+        const unsubscribe = auth.onAuthStateChanged((user) => {
+            setCurrentUser(user);
+            if (user) {
+                getUser(user.uid)
+                    .then((value) => {
+                        if (mounted) {
+                            if (value.exists) {
+                                setUserDoc(value);
+                            } else {
+                                setUserDoc();
+                            }
+                            setLoading(false);
                         }
-                    }
-                })
-                .catch((error) => {
-                    if (mounted) {
-                        console.log(error);
-                        setUserDoc();
-                    }
-                });
-        } else {
-            setUserDoc();
-        }
+                    })
+                    .catch((error) => {
+                        if (mounted) {
+                            console.log(error);
+                            setUserDoc();
+                            setLoading(false);
+                        }
+                    });
+            } else {
+                setUserDoc();
+                setLoading(false);
+            }
+
+        });
 
         return () => {
             mounted = false;
+            unsubscribe();
         };
-    }, [currentUser]);
+    }, []);
 
     const value = {
         currentUser,
         userDoc,
         getArticle,
         getNewestArticles,
+        getTopArticles,
+        getReaction,
+        getUser,
         setArticle,
+        setView,
         login,
         signOut,
         signup,
+        updateProfile,
+        updateReaction,
     };
 
     return (
         <Firebase.Provider value={value}>
-            {!loading && children}
+            {!loading ?
+                children :
+                <Loading />
+            }
         </Firebase.Provider>
     );
 }

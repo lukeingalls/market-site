@@ -8,8 +8,8 @@ import './ArticleCardDeck.scss';
 export default function ArticleCardDeck({ Articles }) {
     return (
         <Container>
-            <Row className="article-card__deck justify-content-center">
-                {Articles.docs.map((article) => {
+            <Row className="article-card__deck">
+                {Articles.map((article) => {
                     return (
                         <Col
                             className="article-card"

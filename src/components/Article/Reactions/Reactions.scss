@@ -1,0 +1,49 @@
+
+.reaction {
+    font-size: 40px;
+    padding: 5px;
+    user-select: none;
+    cursor: pointer; 
+    color: var(--gray);
+
+    &__container {
+        position: sticky;
+        top: 80px;
+        margin-top: 64px;
+        background-color: var(--light);
+        border-radius: 5%;
+        padding: 10px;
+
+        @media all and (max-width: 767px) {
+            & {
+                margin-top: 20px;
+                margin-bottom: 20px;
+             }
+         }
+    }
+
+    &__header {
+        text-align: center;
+        font-size: 18px;
+        color: var(--gray-dark);
+        font-family: sans-serif;
+    }
+
+    &__button-group {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    &--danger {
+        color: var(--danger);
+    }
+
+    &--info {
+        color: var(--info);
+    }
+
+    &--success {
+        color: var(--success);
+    }
+}

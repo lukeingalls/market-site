@@ -2,12 +2,12 @@
 import React, { useState } from 'react';
 import { Button, Dropdown } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../../contexts/FirebaseContext';
-import LoginModal from './LoginModal/LoginModal';
-import '../../styles/btn-block.scss';
+import { useAuth } from '../../../contexts/FirebaseContext';
+import LoginModal from '../LoginModal/LoginModal';
+import '../../../styles/btn-block.scss';
 import './AccountDropdown.scss';
-import SignUpModal from './SignUp/SignUpModal';
-import { routes } from '../../routes';
+import SignUpModal from '../SignUp/SignUpModal';
+import { routes } from '../../../routes';
 
 const AccountCircle = React.forwardRef(({ onClick }, ref) => {
     return (
@@ -32,7 +32,7 @@ const AccountCircle = React.forwardRef(({ onClick }, ref) => {
 });
 
 export default function AccountDropdown({ className }) {
-    const { currentUser, userDoc, signOut } = useAuth();
+    const { userDoc, signOut } = useAuth();
     const [showLogin, setShowLogin] = useState(false);
     const [showSignUp, setShowSignUp] = useState(false);
 
@@ -52,7 +52,7 @@ export default function AccountDropdown({ className }) {
         setShowSignUp(true);
     };
 
-    if (currentUser) {
+    if (userDoc && userDoc.exists) {
         return (
             <Dropdown className={className}>
                 <Dropdown.Toggle as={AccountCircle} />
@@ -60,7 +60,7 @@ export default function AccountDropdown({ className }) {
                     align="right"
                     className="text-center w-sm-100"
                 >
-                    <Dropdown.Header>{ currentUser.email }</Dropdown.Header>
+                    <Dropdown.Header>{ userDoc.data().displayName || userDoc.data().email }</Dropdown.Header>
                     <Dropdown.Divider />
                     {(userDoc && userDoc.data().author) &&
                         <Dropdown.Item
@@ -70,7 +70,12 @@ export default function AccountDropdown({ className }) {
                             New Article
                         </Dropdown.Item>
                     }
-                    <Dropdown.Item>Account Info</Dropdown.Item>
+                    <Dropdown.Item
+                        as={Link}
+                        to={routes.account.get()}
+                    >
+                        Manage Account
+                    </Dropdown.Item>
                     <Dropdown.Item onClick={(e) => {
                         e.preventDefault();
                         signOut();

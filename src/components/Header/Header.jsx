@@ -1,8 +1,9 @@
 import React from 'react';
 import { Button, Form, FormControl, Nav, Navbar } from 'react-bootstrap';
-// import { Button, Form, FormControl, Navbar } from 'react-bootstrap';
-import AccountDropdown from '../Account/AccountDropdown';
+import { Link } from 'react-router-dom';
+import AccountDropdown from '../Account/AccountDropdown/AccountDropdown';
 import './Header.scss';
+import { routes } from '../../routes';
 
 export default function Header() {
     return (
@@ -13,7 +14,13 @@ export default function Header() {
             sticky="top"
             variant="dark"
         >
-            <Navbar.Brand className="text-white" href="#home">Navbar</Navbar.Brand>
+            <Navbar.Brand
+                as={Link}
+                className="text-white"
+                to={routes.home.get()}
+            >
+                Navbar
+            </Navbar.Brand>
             <Navbar.Toggle aria-controls="header" />
             <Navbar.Collapse id="header">
                 <Nav className="mr-auto">

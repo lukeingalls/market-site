@@ -1,6 +1,10 @@
-
-
 export const routes = {
+    account: {
+        value: '/manage-account',
+        get() {
+            return '/manage-account';
+        },
+    },
     article: {
         value: '/article/:articleId',
         get(id) {

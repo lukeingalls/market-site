@@ -1,17 +1,21 @@
 /* eslint-disable react/prop-types */
-import React, { useState } from 'react';
-import { Card } from 'react-bootstrap';
+import React from 'react';
+import { Button, Card } from 'react-bootstrap';
 import ArticleViewer from '../ArticleViewer/ArticleViewer';
 import './ArticleCard.scss';
 import getTimeString from '../../../functions/getTimeString';
+import { routes } from '../../../routes';
+import { useHistory } from 'react-router-dom';
 
 export default function ArticleCard({ article }) {
-    /* eslint-disable-next-line */
-    const [timeString, setTimeString] = useState(
-        getTimeString(article.data().created.toDate())
-    );
+    const history = useHistory();
+    const timeString = getTimeString(article.data().created.toDate());
 
-    console.log(timeString);
+    function viewArticle(e) {
+        e.preventDefault();
+        history.push(routes.article.get(article.id));
+    }
+
     return (
         <Card>
             {/* <Card.Img variant="top" /> */}
@@ -35,8 +39,18 @@ export default function ArticleCard({ article }) {
                     className="mt-3 article-card__text"
                 />
             </Card.Body>
-            <Card.Footer className="article-card__timestamp">
-                <small className="text-muted">Posted {timeString}</small>
+            <Card.Footer className="article-card__footer">
+                <p
+                    className="text-muted"
+                >
+                    Posted {timeString}
+                </p>
+                <Button
+                    onClick={viewArticle}
+                    variant="outline-info"
+                >
+                    Read More
+                </Button>
             </Card.Footer>
         </Card>
     );

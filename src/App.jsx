@@ -7,6 +7,7 @@ import Home from './components/Home/Home';
 import { FirebaseProvider } from './contexts/FirebaseContext';
 import { routes } from './routes';
 import AuthorRoute from './components/Routes/AuthorRoute';
+import AccountManage from './components/Account/AccountManage/AccountManage';
 
 function App() {
     return (
@@ -29,6 +30,9 @@ function App() {
                             </AuthorRoute>
                             <Route path={routes.article.value} exact>
                                 <Article />
+                            </Route>
+                            <Route path={routes.account.value} exact>
+                                <AccountManage />
                             </Route>
                         </Switch>
                     </Container>
