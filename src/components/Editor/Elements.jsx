@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import './Elements.scss';
 
-const BlockQuote = ({attributes, children}) => {
+const BlockQuote = ({ attributes, children }) => {
     return (
         <blockquote {...attributes}>
             {children}
@@ -9,7 +9,7 @@ const BlockQuote = ({attributes, children}) => {
     );
 };
 
-const BulletedList = ({attributes, children}) => {
+const BulletedList = ({ attributes, children }) => {
     return (
         <ul {...attributes}>
             {children}
@@ -17,7 +17,7 @@ const BulletedList = ({attributes, children}) => {
     );
 };
 
-const HeadingOne = ({attributes, children}) => {
+const HeadingOne = ({ attributes, children }) => {
     return (
         <h1 {...attributes}>
             {children}
@@ -25,7 +25,7 @@ const HeadingOne = ({attributes, children}) => {
     );
 };
 
-const HeadingTwo = ({attributes, children}) => {
+const HeadingTwo = ({ attributes, children }) => {
     return (
         <h2 {...attributes}>
             {children}
@@ -33,7 +33,20 @@ const HeadingTwo = ({attributes, children}) => {
     );
 };
 
-const ListItem = ({attributes, children}) => {
+const Image = ({ attributes, children, element }) => {
+    return (
+        <div {...attributes}>
+            <div contentEditable={false}>
+                <img src={element.url} style={{
+                    maxWidth: '100%',
+                }} />
+            </div>
+            { children }
+        </div>
+    );
+};
+
+const ListItem = ({ attributes, children }) => {
     return (
         <li {...attributes}>
             {children}
@@ -41,7 +54,7 @@ const ListItem = ({attributes, children}) => {
     );
 };
 
-const NumberedList = ({attributes, children}) => {
+const NumberedList = ({ attributes, children }) => {
     return (
         <ol {...attributes}>
             {children}
@@ -49,7 +62,7 @@ const NumberedList = ({attributes, children}) => {
     );
 };
 
-const DefaultElement = ({attributes, children}) => {
+const DefaultElement = ({ attributes, children }) => {
     return (
         <p {...attributes}>
             {children}
@@ -67,6 +80,8 @@ export const renderCustomElement = (props) => {
             return <HeadingOne {...props} />;
         case 'heading-two':
             return <HeadingTwo {...props} />;
+        case 'image':
+            return <Image {...props} />;
         case 'list-item':
             return <ListItem {...props} />;
         case 'numbered-list':

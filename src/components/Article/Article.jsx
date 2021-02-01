@@ -8,6 +8,7 @@ import { useAuth } from '../../contexts/FirebaseContext';
 import Reactions from './Reactions/Reactions';
 import Disclaimer from './Disclaimer/Disclaimer';
 import Byline from './Byline/Byline';
+import { Helmet } from 'react-helmet';
 
 export default function Article() {
     const { getArticle, setView, getUser } = useAuth();
@@ -21,13 +22,11 @@ export default function Article() {
 
     useEffect(() => {
         let mounted = true;
-        let prevtitle = document.title;
         getArticle(articleId)
             .then((value) => {
                 if (mounted) {
                     if (value.exists) {
                         setTitle(value.data().title);
-                        document.title = value.data().title;
                         setDoc(value);
                         setSubTitle(value.data().subtitle);
                         setArticle(JSON.parse(value.data().content));
@@ -54,7 +53,6 @@ export default function Article() {
 
         return () => {
             mounted = false;
-            document.title = prevtitle;
         };
     }, []);
 
@@ -96,6 +94,21 @@ export default function Article() {
                 </Row>
                 <hr />
                 <Disclaimer />
+                <Helmet>
+                    { title && <title>{title}</title> }
+                    { article && 
+                        <script type="application/ld+json">
+                            {`
+                                "@context": "https://bountfiulfinance.com",
+                                "@type": "NewsArticle",
+                                "author": ${ author?.data().displayName },
+                                "dateCreated": ${ doc?.data().created.toDate().toString() },
+                                "dateModified": ${ doc?.data().lastModified.toDate().toString() },
+                                "headline": ${ title },
+                            `}
+                        </script>
+                    }
+                </Helmet>
             </Container>
         );
     } else {

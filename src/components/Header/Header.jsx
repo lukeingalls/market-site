@@ -16,10 +16,10 @@ export default function Header() {
         >
             <Navbar.Brand
                 as={Link}
-                className="text-white"
+                className="text-white title"
                 to={routes.home.get()}
             >
-                Navbar
+                Bountiful Finance
             </Navbar.Brand>
             <Navbar.Toggle aria-controls="header" />
             <Navbar.Collapse id="header">

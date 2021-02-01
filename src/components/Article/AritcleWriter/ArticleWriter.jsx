@@ -1,20 +1,55 @@
 /* eslint-disable */
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { DocumentEditor } from '../../Editor/Editor';
 import { Alert, Button, Col, Container, Form, Row } from 'react-bootstrap';
 import { useAuth } from '../../../contexts/FirebaseContext';
-import { useHistory } from 'react-router-dom';
+import { useParams, useHistory } from 'react-router-dom';
 import Loading from '../../Loading/Loading';
 import { routes } from '../../../routes';
 
 export default function ArticleWriter() {
-    const { userDoc, setArticle } = useAuth();
+    const { articleId } = useParams();
+    const cached = {
+        title: localStorage.getItem('draft-title' || ''),
+        subtitle: localStorage.getItem('draft-subtitle' || ''),
+        content: localStorage.getItem('draft-content' || undefined),
+    }
+    const { userDoc, setArticle, getArticle } = useAuth();
     const history = useHistory();
-    const [title, setTitle] = useState(localStorage.getItem('draft-title') || '');
-    const [subtitle, setSubTitle] = useState(localStorage.getItem('draft-subtitle') || '');
+    const [title, setTitle] = useState(cached.title);
+    const [show, setShow] = useState(true);
+    const [subtitle, setSubTitle] = useState(cached.subtitle);
+    const [content, setContent] = useState(cached.content);
+    const [remoteArticle, setRemoteArticle] = useState();
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false);
     const contentRef = useRef();
+
+    useEffect(() => {
+        let mount = true;
+        if (articleId !== 'new') {
+            setLoading(true);
+            getArticle(articleId)
+                .then((article) => {
+                    if (mount) {
+                        if (article.exists) {
+                            setRemoteArticle(article);
+                            setContent(article.data().content);
+                            setTitle(article.data().title);
+                            setSubTitle(article.data().subtitle);
+                            setLoading(false);
+                        }
+                    }
+                })
+                .catch((error) => {
+                    console.log(error);
+                    setLoading(false);
+                })
+        }
+        return () => {
+            mount = false;
+        }
+    }, [])
 
     function submitArticle(e) {
         e.preventDefault();
@@ -26,22 +61,40 @@ export default function ArticleWriter() {
         ) {
             if (subtitle.length <= 140) {
                 const authorId = userDoc.data().uid;
-                const content = JSON.stringify(contentRef.current)
+                const c = JSON.stringify(contentRef.current)
                 setLoading(true);
-                setArticle(
-                    authorId,
-                    content,
-                    title,
-                    subtitle || '',
-                )
-                .then((value) => {
-                    setLoading(false);
-                    history.push(routes.article.get(value.id));
-                })
-                .catch((error) => {
-                    setLoading(false);
-                    setError(error);
-                });
+                if (articleId === 'new') {
+                    setArticle(
+                        authorId,
+                        c,
+                        title,
+                        subtitle || '',
+                    )
+                        .then((value) => {
+                            setLoading(false);
+                            history.push(routes.article.get(value.id));
+                        })
+                        .catch((error) => {
+                            setLoading(false);
+                            setError(error);
+                        });
+                } else {
+                    setArticle(
+                        authorId,
+                        c,
+                        title,
+                        subtitle || '',
+                        articleId,
+                    )
+                        .then(() => {
+                            setLoading(false);
+                            history.push(routes.article.get(articleId));
+                        })
+                        .catch((error) => {
+                            setLoading(false);
+                            setError(error);
+                        })
+                }
             } else {
                 setError('Your subtitle may not be longer than 140 characters!');
             }
@@ -69,8 +122,45 @@ export default function ArticleWriter() {
     if (!loading) {
         return (
             <Container>
-                { error && 
+                { error &&
                     <Alert variant="danger">{error}</Alert>
+                }
+                { (!!remoteArticle && !!(cached.content)) &&
+                    <Alert
+                        dismissible
+                        show={show}
+                        onClose={() => setShow(false)}
+                        variant="warning"
+                    >
+                        <Alert.Heading
+                            as={Row}
+                            className="justify-content-center h6"
+                        >
+                            You have a local and remote cache for this article. Select which you would like to use.
+                        </Alert.Heading>
+                        <Row className="justify-content-center mt-3">
+                            <Button
+                                variant="warning mr-3"
+                                onClick={() => {
+                                    setContent(cached.content);
+                                    setTitle(cached.title);
+                                    setSubTitle(cached.subtitle);
+                                }}
+                            >
+                                Local
+                            </Button>
+                            <Button
+                                onClick={() => {
+                                    setContent(remoteArticle.data().content);
+                                    setTitle(remoteArticle.data().title);
+                                    setSubTitle(remoteArticle.data().subtitle);
+                                }}
+                                variant="warning"
+                            >
+                                Remote
+                            </Button>
+                        </Row>
+                    </Alert>
                 }
                 <Form>
                     <Form.Group as={Row} controlId="exampleForm.ControlInput1">
@@ -97,16 +187,16 @@ export default function ArticleWriter() {
                         </Col>
                     </Form.Group>
                 </Form>
-                <DocumentEditor ref={contentRef}/>
+                <DocumentEditor prevContent={content} ref={contentRef} />
                 <Row className="d-flex justify-content-end my-3" noGutters>
                     <Button
-                    // TODO: Make preview work
                         className="mr-3"
                         disabled={loading}
                         type="button"
                         variant="outline-info"
+                        onClick={submitArticle}
                     >
-                        Preview
+                        Update
                     </Button>
                     <Button
                         disabled={loading}

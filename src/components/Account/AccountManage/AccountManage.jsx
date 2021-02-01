@@ -99,7 +99,11 @@ export default function AccountManage() {
                     {'This page may seem rather empty, but that\'s because you are not an author! \
                     We give our authors lots of control over their content. You should consider becoming one!'}
                 </Alert> :
-                <AuthorForm displayName={displayName}/>
+                <AuthorForm
+                    displayName={displayName}
+                    title={userDoc.data()?.title}
+                    bio={userDoc.data()?.bio}
+                />
             }
         </Container>
     );

@@ -33,6 +33,23 @@ const BlockButton = ({ format, icon }) => {
     );
 };
 
+const ImageButton = ({ format, icon }) => {
+    const editor = useSlate();
+    return (
+        <Button
+            active={CustomEditor.isBlockActive(editor, format)}
+            onMouseDown={event => {
+                event.preventDefault();
+                // const url = window.prompt('Enter teh URL of the image:');
+                CustomEditor.insertImage(editor, 'https://preview.redd.it/h7sap8vb5qe61.jpg?width=640&crop=smart&auto=webp&s=5299959c80080d87d77ea50c680a79ac99220beb');
+                // CustomEditor.toggleBlock(editor, format);
+            }}
+        >
+            <Icon>{icon}</Icon>
+        </Button>
+    );
+};
+
 const MarkButton = ({ format, icon }) => {
     const editor = useSlate();
     return (
@@ -49,9 +66,8 @@ const MarkButton = ({ format, icon }) => {
 };
 
 /* eslint-disable-next-line */
-export const DocumentEditor = React.forwardRef((children, ref) => {
-    // TODO: Support multiple cached docs
-    const [value, setValue] = useState(JSON.parse(localStorage.getItem('content')) || initialValue);
+export const DocumentEditor = React.forwardRef(({ prevContent }, ref) => {
+    const [value, setValue] = useState(prevContent ? JSON.parse(prevContent) : initialValue);
     const renderElement = useCallback(props => renderCustomElement(props), []);
     const renderLeaf = useCallback(props => renderCustomLeaves(props), []);
     const editor = useMemo(() => withHistory(withReact(createEditor())), []);
@@ -64,8 +80,7 @@ export const DocumentEditor = React.forwardRef((children, ref) => {
                 setValue(value);
                 ref.current = value;
                 const content = JSON.stringify(value);
-                // TODO: Support multiple cached docs
-                localStorage.setItem('content', content);
+                localStorage.setItem('draft-content', content);
             }}>
             <Card>
                 <Card.Header>
@@ -78,6 +93,7 @@ export const DocumentEditor = React.forwardRef((children, ref) => {
                     <BlockButton format="block-quote" icon="format_quote" />
                     <BlockButton format="numbered-list" icon="format_list_numbered" />
                     <BlockButton format="bulleted-list" icon="format_list_bulleted" />
+                    <ImageButton format="image" icon="add_photo_alternate" />
                 </Card.Header>
                 <Card.Body>
                     <Editable

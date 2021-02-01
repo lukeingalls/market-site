@@ -32,13 +32,13 @@ const Reaction = ({
 
 
 export default function Reactions({ className }) {
-    const { userDoc, updateReaction, getReaction } = useAuth();
+    const { userDoc, currentUser, updateReaction, getReaction } = useAuth();
     const [loaded, setLoaded] = useState(false);
     const [reaction, setReaction] = useState('');
     const { articleId } = useParams();
 
     useEffect(() => {
-        if (userDoc.exists && loaded) {
+        if (userDoc?.exists && loaded) {
             updateReaction(articleId, reaction);
         }
     }, [reaction]);
@@ -46,19 +46,21 @@ export default function Reactions({ className }) {
     useEffect(() => {
         let mount = true;
 
-        getReaction(articleId)
-            .then((doc) => {
-                if (mount) {
-                    if (doc.exists) {
-                        setReaction(doc.data().reaction);
+        if (currentUser) {
+            getReaction(articleId)
+                .then((doc) => {
+                    if (mount) {
+                        if (doc.exists) {
+                            setReaction(doc.data().reaction);
+                        }
+                        setLoaded(true);
                     }
-                    setLoaded(true);
-                }
-            });
-
-        return () => {
-            mount = false;
-        };
+                });
+    
+            return () => {
+                mount = false;
+            };
+        }
     }, []);
 
     const reactionsList = [

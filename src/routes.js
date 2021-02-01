@@ -10,6 +10,18 @@ export const routes = {
         get(id) {
             return `/article/${id}`;
         },
+        edit: {
+            value: '/article/edit-article/:articleId',
+            get(id) {
+                return `/article/edit-article/${id ? id : 'new'}`;
+            }
+        },
+        manage: {
+            value: '/articles/manage',
+            get() {
+                return '/articles/manage';
+            }
+        },
     },
     default: {
         value: '/404',
@@ -21,12 +33,6 @@ export const routes = {
         value: '/',
         get() {
             return '/';
-        },
-    },
-    newArticle: {
-        value: '/new-article',
-        get() {
-            return '/new-article';
         },
     },
 };

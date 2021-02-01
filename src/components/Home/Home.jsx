@@ -74,7 +74,7 @@ export default function Home() {
                 {topArticle && 
                     <ArticleHighlight Article={topArticle}/>
                 }
-                {popularArticles &&
+                {(popularArticles && popularArticles.length > 1) &&
                     <Container>
                         <h3 className="text-center my-4">Popular Articles</h3>
                         <ArticleCardDeck Articles={popularArticles} />

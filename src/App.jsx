@@ -8,6 +8,8 @@ import { FirebaseProvider } from './contexts/FirebaseContext';
 import { routes } from './routes';
 import AuthorRoute from './components/Routes/AuthorRoute';
 import AccountManage from './components/Account/AccountManage/AccountManage';
+import ArticleManage from './components/Article/ArticleManage/ArticleManage';
+import { Helmet } from 'react-helmet';
 
 function App() {
     return (
@@ -25,7 +27,10 @@ function App() {
                             <Route path={routes.home.value} exact>
                                 <Home />
                             </Route>
-                            <AuthorRoute path={routes.newArticle.value} exact>
+                            <AuthorRoute path={routes.article.manage.value} exact>
+                                <ArticleManage />
+                            </AuthorRoute>
+                            <AuthorRoute path={routes.article.edit.value} exact>
                                 <ArticleWriter />
                             </AuthorRoute>
                             <Route path={routes.article.value} exact>
@@ -38,6 +43,13 @@ function App() {
                     </Container>
                 </Router>
             </FirebaseProvider>
+            <Helmet>
+                <title>Bountiful Finance - Financial news from independent authors</title>
+                <meta
+                    name="description"
+                    content="In depth stock market analysis provided by independent authors."
+                />
+            </Helmet>
         </div>
     );
 }

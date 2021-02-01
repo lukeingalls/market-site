@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { auth, db, firestoreTimestamp, increment } from '../firebase';
+import { auth, db, firestoreTimestamp, increment, storage } from '../firebase';
 import PropTypes from 'prop-types';
 import Loading from '../components/Loading/Loading';
 
@@ -13,7 +13,6 @@ export function FirebaseProvider({ children }) {
     const [currentUser, setCurrentUser] = useState();
     const [userDoc, setUserDoc] = useState();
     const [loading, setLoading] = useState(true);
-    // const [authLoading, setAuthLoading] = useState(true);
 
     const usersRef = db.collection('users');
     const articlesRef = db.collection('articles');
@@ -45,6 +44,12 @@ export function FirebaseProvider({ children }) {
             .get();
     }
 
+    function getUserArticles() {
+        return articlesRef
+            .where('authorId', '==', currentUser.uid)
+            .get();
+    }
+
     // TODO: make this work with time constraint
     function getTopArticles(limit = 3) {
         let weekAgo = new Date();
@@ -55,45 +60,57 @@ export function FirebaseProvider({ children }) {
             .get();
     }
 
-    function setArticle(authorId, content, title, subtitle = '') {
+    function setArticle(authorId, content, title, subtitle = '', articleId = undefined) {
         const now = firestoreTimestamp(new Date());
-
-        return articlesRef
-            .add({
-                authorId: authorId,
-                content: content,
-                created: now,
-                lastModified: now,
-                subtitle: subtitle,
-                title: title,
-                views: 0,
-            });
+        if (!articleId) {
+            return articlesRef
+                .add({
+                    authorId: authorId,
+                    content: content,
+                    created: now,
+                    lastModified: now,
+                    subtitle: subtitle,
+                    title: title,
+                    views: 0,
+                });
+        } else {
+            return articlesRef
+                .doc(articleId)
+                .set({
+                    content: content,
+                    lastModified: now,
+                    subtitle: subtitle,
+                    title: title,
+                }, { merge: true });
+        }
     }
 
     function setView(articleId) {
-        const now = firestoreTimestamp(new Date());
-        const batch = db.batch();
-        const viewRef = userDoc.ref.collection('views').doc(articleId);
-        const articleRef = articlesRef.doc(articleId);
-        return viewRef.get()
-            .then((value) => {
-                if (value.exists) {
-                    return viewRef
-                        .set({
+        if (currentUser) {
+            const now = firestoreTimestamp(new Date());
+            const batch = db.batch();
+            const viewRef = userDoc.ref.collection('views').doc(articleId);
+            const articleRef = articlesRef.doc(articleId);
+            return viewRef.get()
+                .then((value) => {
+                    if (value.exists) {
+                        return viewRef
+                            .set({
+                                lastViewed: now,
+                                numViews: increment,
+                            }, { merge: true });
+                    } else {
+                        batch.set(viewRef, {
                             lastViewed: now,
-                            numViews: increment,
+                            numViews: 1,
+                        });
+                        batch.set(articleRef, {
+                            views: increment,
                         }, { merge: true });
-                } else {
-                    batch.set(viewRef, {
-                        lastViewed: now,
-                        numViews: 1,
-                    });
-                    batch.set(articleRef, {
-                        views: increment,
-                    }, { merge: true });
-                    return batch.commit();
-                }
-            });
+                        return batch.commit();
+                    }
+                });
+        }
     }
 
     function updateProfile(updates) {
@@ -111,6 +128,13 @@ export function FirebaseProvider({ children }) {
             .set({
                 reaction: reaction,
             });
+    }
+
+    function uploadProfilePic(pic) {
+        const name = `profile.${pic.type === 'image/jpeg' ? 'jpg' : 'png'}`;
+        const userPic = storage.ref(`${currentUser.uid}/${name}`);
+
+        return userPic.put(pic);
     }
 
     function login(email, password) {
@@ -169,6 +193,7 @@ export function FirebaseProvider({ children }) {
         getTopArticles,
         getReaction,
         getUser,
+        getUserArticles,
         setArticle,
         setView,
         login,
@@ -176,6 +201,7 @@ export function FirebaseProvider({ children }) {
         signup,
         updateProfile,
         updateReaction,
+        uploadProfilePic,
     };
 
     return (

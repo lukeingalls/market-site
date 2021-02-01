@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Button, Col, Container, Form, Spinner } from 'react-bootstrap';
 import Byline from '../../Article/Byline/Byline';
 import { useAuth } from '../../../contexts/FirebaseContext';
@@ -10,8 +10,11 @@ export default function AuthorForm({ style, displayName, title: t, bio: b }) {
     const [title, setTitle] = useState(t || '');
     const [bio, setBio] = useState(b || '');
     const [loading, setLoading] = useState(false);
-
-    const { updateProfile } = useAuth();
+    const [img, setImage] = useState();
+    const imgRef = useRef();
+    
+    /* eslint-disable-next-line */
+    const { updateProfile, uploadProfilePic } = useAuth();
 
     const submit = (e) => {
         e.preventDefault();
@@ -29,6 +32,16 @@ export default function AuthorForm({ style, displayName, title: t, bio: b }) {
                 console.log(error);
                 setLoading(false);
             });
+
+        // if (img) {
+        //     uploadProfilePic(imgRef.current.files[0])
+        //         .then((snapshot) => {
+        //             console.log(snapshot, typeof(snapshot));
+        //         })
+        //         .catch((error) => {
+        //             console.log(error);
+        //         });
+        // }
     };
 
     return (
@@ -66,6 +79,22 @@ export default function AuthorForm({ style, displayName, title: t, bio: b }) {
                     />
                 </Form.Group>
             </Form.Row>
+            <Form.Row>
+                <Form.Group
+                    as={Col}
+                >
+                    <Form.File
+                        label="Upload a profile picture"
+                        ref={imgRef}
+                        onChange={(e) => {
+                            if (e.target.value) {
+                                setImage(URL.createObjectURL(e.target.files[0]));
+                                console.log(e.target.files[0]);
+                            }
+                        }}
+                    />
+                </Form.Group>
+            </Form.Row>
             <Container>
                 <h3>
                     Here is a preview of your byline
@@ -75,6 +104,7 @@ export default function AuthorForm({ style, displayName, title: t, bio: b }) {
                     title={title}
                     bio={bio}
                     timestamp={String(new Date)}
+                    img={img}
                 />
             </Container>
             <Button
