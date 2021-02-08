@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import './Elements.scss';
 import { storage } from '../../firebase';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 const BlockQuote = ({ attributes, children }) => {
     return (
@@ -36,19 +36,19 @@ const HeadingTwo = ({ attributes, children }) => {
 };
 
 const Image = ({ attributes, children, element }) => {
-    const [url, setUrl] = useState();
-    if (element.url.includes('gs://')) {
-        storage.refFromURL(element.url).getDownloadURL()
-            .then((u) => {
-                console.log(u);
-                setUrl(u);
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-    } else {
-        setUrl(element.url);
-    }
+    const [url, setUrl] = useState(element.url);
+    useEffect(() => {
+        if (element.url.includes('gs://')) {
+            storage.refFromURL(element.url).getDownloadURL()
+                .then((u) => {
+                    console.log(u);
+                    setUrl(u);
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+        }
+    }, []);
     return (
         <div {...attributes}>
             <div contentEditable={false}>

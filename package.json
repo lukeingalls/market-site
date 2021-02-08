@@ -25,7 +25,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "emulate": "firebase emulators:start --export-on-exit=./firestore --import=./firestore"
+    "emulate": "firebase emulators:start --export-on-exit=./dir --import=./dir"
   },
   "eslintConfig": {
     "extends": [
