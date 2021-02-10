@@ -23,3 +23,9 @@ yarn-debug.log*
 yarn-error.log*
 .eslintcache
 .firebase/hosting.YnVpbGQ.cache
+
+/dir
+base-logo.xcf
+firebase-debug.log
+firestore-debug.log
+ui-debug.log

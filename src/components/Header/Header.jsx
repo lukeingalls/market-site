@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import AccountDropdown from '../Account/AccountDropdown/AccountDropdown';
 import './Header.scss';
 import { routes } from '../../routes';
+import logo from '../../logos/bountiful-financepx250.png';
 
 export default function Header() {
     return (
@@ -19,6 +20,13 @@ export default function Header() {
                 className="text-white title"
                 to={routes.home.get()}
             >
+                <img
+                    src={logo}
+                    style={{
+                        height: 64,
+                        marginTop: -20,
+                    }}
+                />
                 Bountiful Finance
             </Navbar.Brand>
             <Navbar.Toggle aria-controls="header" />
