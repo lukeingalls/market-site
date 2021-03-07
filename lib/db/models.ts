@@ -1,6 +1,5 @@
 import {
   DataTypes,
-  HasManyGetAssociationsMixin,
   HasOneGetAssociationMixin,
   IntegerDataType,
   Model,
@@ -16,6 +15,10 @@ export interface ArticleAttributes {
   subtitle: string | null;
   title: string;
   url: string;
+
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
+  authorIdUsers?: string;
 }
 
 interface ArticleCreationAttributes
@@ -108,6 +111,10 @@ export interface UserAttributes {
   email: string | null;
   firstName: string | null;
   lastName: string | null;
+  title: string;
+
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
 }
 
 interface UserCreationAttributes
@@ -124,6 +131,7 @@ export class User extends Model<UserAttributes, UserCreationAttributes> {
   public email!: string | null;
   public firstName!: string | null;
   public lastName!: string | null;
+  public title!: string;
 
   public readonly createdAt: Date;
   public readonly updatedAt: Date;
@@ -169,6 +177,12 @@ User.init(
         isAlpha: true,
       },
     },
+    title: {
+      type: DataTypes.STRING,
+      validate: {
+        isAlphanumeric: true,
+      },
+    },
   },
   { sequelize, modelName: "user" }
 );
@@ -176,5 +190,5 @@ User.init(
 export const Author = Article.belongsTo(User, { as: "author" });
 export const Articles = User.hasMany(Article);
 
-User.sync({ alter: true });
-Article.sync({ alter: true });
+// User.sync({ alter: true });
+// Article.sync({ alter: true });

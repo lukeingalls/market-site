@@ -1,12 +1,5 @@
-import {
-  Article,
-  ArticleAttributes,
-  Author,
-  createURL,
-  User,
-} from "../../lib/db/models";
+import { Article, ArticleAttributes, createURL } from "../../lib/db/models";
 import { auth } from "../../lib/firebase/firebase-admin";
-import { getUser } from "../../lib/db/queries";
 
 export default async (req, res) => {
   if (req.method === "POST") {

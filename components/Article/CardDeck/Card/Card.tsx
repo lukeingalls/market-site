@@ -2,11 +2,15 @@ import { Button, Card } from "react-bootstrap";
 import * as styles from "../../../../styles/Article/CardDeck/Card/Card.module.scss";
 import ReactMarkdown from "react-markdown";
 import { getTimeString } from "../../../../lib/time";
-import { useRouter } from "next/router";
+import { ArticleAttributes } from "../../../../lib/db/models";
 
-export default function ArticleCard({ article }) {
-  const timeString = getTimeString(article.createdAt);
-  const router = useRouter();
+interface ArticleCardProps {
+  article: ArticleAttributes;
+}
+
+export default function ArticleCard({ article }: ArticleCardProps) {
+  // const timeString = getTimeString(article.createdAt);
+  const timeString = getTimeString(new Date());
 
   return (
     <Card>

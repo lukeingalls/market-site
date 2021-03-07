@@ -1,4 +1,4 @@
-export function getTimeString(time) {
+export function getTimeString(time: string | Date) {
   const oneHour = 1000 * 60 * 60;
   const now = new Date();
   const then = new Date(time);

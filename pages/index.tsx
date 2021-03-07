@@ -1,10 +1,16 @@
 import { Container } from "react-bootstrap";
 import { newArticles } from "../lib/articles/new-articles";
 import ArticleCardDeck from "../components/Article/CardDeck/CardDeck";
+import { ArticleAttributes } from "../lib/db/models";
 // import ArticleHighlight from "../Article/ArticleHighlight/ArticleHighlight";
 
+interface IndexProps {
+  recentArticles: ArticleAttributes[];
+  popularArticles: ArticleAttributes[];
+}
+
 export const getStaticProps = async () => {
-  const recentArticles = await newArticles();
+  const recentArticles: ArticleAttributes[] = await newArticles();
 
   return {
     props: {
@@ -15,7 +21,7 @@ export const getStaticProps = async () => {
   };
 };
 
-export default function Index({ recentArticles, popularArticles }) {
+export default function Index({ recentArticles, popularArticles }: IndexProps) {
   return (
     <Container>
       {/* {topArticle && <ArticleHighlight Article={topArticle} />} */}

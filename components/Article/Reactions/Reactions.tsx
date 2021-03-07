@@ -3,20 +3,38 @@ import { Container, Row } from "react-bootstrap";
 import { HandThumbsDownFill, HandThumbsUpFill } from "react-bootstrap-icons";
 import * as styles from "../../../styles/Article/Reactions.module.scss";
 
-const Reaction = ({ active, className, Component, reaction, setReaction }) => {
+interface ReactionsProp {
+  className?: string;
+}
+
+interface ReactionProp {
+  active: boolean;
+  className?: string;
+  Component: any; // TODO: change type
+  reaction: string;
+  setReaction: any; // TODO: change type
+}
+
+const Reaction = ({
+  active,
+  className,
+  Component,
+  reaction,
+  setReaction,
+}: ReactionProp) => {
   const onReaction = () => {
     setReaction(active ? "" : reaction);
   };
 
   return (
     <Component
-      className={`${active ? className : ""} ${styles.reaction}`}
+      className={`${active ? className : ""} ${styles["reaction"]}`}
       onClick={onReaction}
     />
   );
 };
 
-export default function Reactions({ className }) {
+export default function Reactions({ className }: ReactionsProp) {
   const [userReaction, setUserReaction] = useState("");
   const reactionsList = [
     {
@@ -33,9 +51,9 @@ export default function Reactions({ className }) {
 
   return (
     <Container
-      className={`${styles.reaction__container} border ${className || ""}`}
+      className={`${styles["reaction__container"]} border ${className || ""}`}
     >
-      <h4 className={`${styles.reaction__header}`}>Rate Article</h4>
+      <h4 className={`${styles["reaction__header"]}`}>Rate Article</h4>
       <Row className={`${styles["reaction__button-group"]}`}>
         {reactionsList.map((reaction) => {
           return (

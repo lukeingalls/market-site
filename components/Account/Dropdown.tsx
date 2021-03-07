@@ -45,7 +45,7 @@ export default function AccountDropdown({ className }) {
           </Dropdown.Header>
           <Dropdown.Divider />
           {userData?.author && (
-            <Dropdown.Item href="/articles/manage">
+            <Dropdown.Item href="/articles/my-articles">
               Manage Articles
             </Dropdown.Item>
           )}

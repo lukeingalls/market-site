@@ -1,33 +1,67 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert, Button, Card, Form, Row } from "react-bootstrap";
-import Router from "next/router";
-import fetcher from "../../lib/fetcher";
-import { useAuth } from "../../contexts/Auth";
-import { ArticleAttributes } from "../../lib/db/models";
-import { NextApiResponse } from "next";
+import Router, { useRouter } from "next/router";
+import fetcher from "../../../lib/fetcher";
+import { useAuth } from "../../../contexts/Auth";
+import { ArticleAttributes } from "../../../lib/db/models";
 
 function manage() {
+  const router = useRouter();
   const [article, setArticle] = useState<ArticleAttributes>();
   const [error, setError] = useState("");
   const { token } = useAuth();
+  const { articleId } = router.query;
+
+  useEffect(() => {
+    let mount = true;
+    if (token && articleId) {
+      (async () => {
+        const resp = await fetcher(
+          "/api/get/article",
+          token,
+          "POST",
+          JSON.stringify(articleId)
+        );
+        setArticle(resp as ArticleAttributes);
+      })();
+    }
+    return () => {
+      mount = false;
+    };
+  }, [token, articleId]);
 
   const submit = (e) => {
-    e.preventDefault();
-    if (article) {
-      setError("");
-      fetcher("/api/create-article", token, "POST", JSON.stringify(article))
-        .then((response) => {
-          console.log(response);
-          if (response?.success) {
-            Router.push(JSON.parse(response?.content)?.url || "/");
-          } else {
-            setError("Something went wrong 😕...");
-          }
-        })
-        .catch((error) => {
-          console.error(error);
-          setError("Couldn't contact the server 😧...");
-        });
+    if (articleId === "new") {
+      e.preventDefault();
+      if (article) {
+        setError("");
+        fetcher("/api/create-article", token, "POST", JSON.stringify(article))
+          .then((response) => {
+            console.log(response);
+            if (response?.success) {
+              Router.push({
+                pathname: `/articles/${JSON.parse(response.content)?.url}`,
+              });
+            } else {
+              setError("Something went wrong 😕...");
+            }
+          })
+          .catch((error) => {
+            console.error(error);
+            setError("Couldn't contact the server 😧...");
+          });
+      }
+    } else {
+      fetcher(
+        "/api/update/article",
+        token,
+        "POST",
+        JSON.stringify(article)
+      ).then((response) => {
+        if (response?.success) {
+          setError("Successfully updated article!");
+        }
+      });
     }
   };
 

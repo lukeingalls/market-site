@@ -1,0 +1,10 @@
+.manage-article {
+    background-color: var(--light);
+    padding: 15px;
+    margin-bottom: 10px;
+
+    &--title {
+        font-size: 18px;
+        font-weight: bold;
+    }
+}

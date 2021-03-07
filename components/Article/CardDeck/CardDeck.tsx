@@ -1,8 +1,13 @@
 import { Col, Container, Row } from "react-bootstrap";
 import ArticleCard from "./Card/Card";
 import * as styles from "../../../styles/Article/CardDeck/CardDeck.module.scss";
+import { ArticleAttributes } from "../../../lib/db/models";
 
-export default function ArticleCardDeck({ Articles }) {
+interface ArticleCardDeckProps {
+  Articles: ArticleAttributes[];
+}
+
+export default function ArticleCardDeck({ Articles }: ArticleCardDeckProps) {
   return (
     <Container>
       <Row className={`${styles["article-card__deck"]}`}>
