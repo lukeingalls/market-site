@@ -1,0 +1,13 @@
+@import '../w.scss';
+
+.account-dropdown {
+    cursor: pointer;
+
+    &--icon {
+        font-size: 40px;
+    }
+
+    &--text {
+        font-size: 24px;
+    }
+}
