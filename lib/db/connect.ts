@@ -4,6 +4,7 @@ import * as dotenv from "dotenv";
 dotenv.config({ path: ".env.local" });
 
 const sequelize = new Sequelize(process.env.DB_URI as string);
+// const sequelize = new Sequelize("postgres://iMac@localhost:5432/");
 // const sequelize = new Sequelize("marketsite", "postgres", "cicEiPmFMsj4AnP6", {
 //   dialect: "postgres",
 //   pool: {

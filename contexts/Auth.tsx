@@ -2,25 +2,24 @@ import { createContext, Context, useContext, useEffect, useState } from "react";
 import { auth } from "../lib/firebase/firebase";
 import firebase from "firebase";
 import fetcher from "../lib/fetcher";
-import { User } from "../lib/db/models";
 
 export interface Auth {
   signInWithGoogle: () => Promise<firebase.auth.UserCredential | void>;
   currentUser: firebase.User;
   signOut: () => Promise<void>;
-  getToken: () => Promise<string | void>;
+  token: string;
+  userData: {};
 }
 
 const AuthContext: Context<Auth> = createContext<Auth>({
   currentUser: undefined,
   signInWithGoogle: async () => {},
   signOut: async () => {},
-  getToken: async () => {},
+  token: undefined,
+  userData: undefined,
 });
 
 export default function AuthProvider({ children }) {
-  const [contextAuth, setContextAuth] = useState<firebase.User>(null);
-
   function signInWithGoogle() {
     const provider = new firebase.auth.GoogleAuthProvider();
 
@@ -31,41 +30,50 @@ export default function AuthProvider({ children }) {
     return auth.signOut();
   }
 
-  function getIdToken() {
-    return contextAuth?.getIdToken();
-  }
+  const [authValue, setAuthValue] = useState<Auth>({
+    currentUser: undefined,
+    signInWithGoogle,
+    signOut,
+    token: undefined,
+    userData: undefined,
+  });
 
   useEffect(() => {
-    const unsubscribe = firebase
+    const auth_unsubscribe = firebase
       .auth()
       .onAuthStateChanged(async (authState: firebase.User | null) => {
-        setContextAuth(authState);
+        if (authState) {
+          try {
+            const token = await authState.getIdToken();
+            const user: JSON = await fetcher("/api/get-user", token, "GET");
+            setAuthValue({
+              ...authValue,
+              currentUser: authState,
+              token,
+              userData: user,
+            });
+          } catch (error) {
+            console.error(error);
+          }
+        } else {
+          setAuthValue({
+            ...authValue,
+            currentUser: undefined,
+            token: undefined,
+            userData: undefined,
+          });
+        }
       });
 
-    return () => unsubscribe();
+    return () => {
+      auth_unsubscribe();
+    };
   }, []);
-
-  useEffect(() => {
-    (async () => {
-      if (contextAuth) {
-        try {
-          const token = await getIdToken();
-          const user: User = await fetcher("/api/get-user-data", token);
-          console.log(user);
-        } catch (error) {
-          console.error(error);
-        }
-      }
-    })();
-  }, [contextAuth]);
 
   return (
     <AuthContext.Provider
       value={{
-        signInWithGoogle,
-        signOut,
-        getToken: getIdToken,
-        currentUser: contextAuth,
+        ...authValue,
       }}
     >
       {children}

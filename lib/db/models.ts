@@ -153,4 +153,4 @@ User.init(
 // const Author = Article.belongsTo(User, { as: "author" });
 
 User.sync({ alter: true });
-// Article.sync({ alter: true });
+Article.sync({ alter: true });
