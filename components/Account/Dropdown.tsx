@@ -1,13 +1,13 @@
 import { forwardRef, LegacyRef } from "react";
 import { Button, Dropdown } from "react-bootstrap";
-// import Link from "next/link";
+import Link from "next/link";
 import { useAuth } from "../../contexts/Auth";
 import * as btnStyles from "../../styles/btn-block.module.scss";
 import * as styles from "../../styles/Account/Dropdown.module.scss";
 import { PersonCircle } from "react-bootstrap-icons";
 
 interface AccountCircleProps {
-  onClick: () => void;
+  onClick: (e: MouseEvent) => void;
 }
 
 const AccountCircle = forwardRef(
@@ -18,7 +18,8 @@ const AccountCircle = forwardRef(
         ref={ref}
         onClick={(e) => {
           e.preventDefault();
-          onClick();
+          // @ts-ignore
+          onClick(e);
         }}
         role="dropdown"
         aria-label="Account Options"
@@ -33,21 +34,21 @@ const AccountCircle = forwardRef(
 );
 
 export default function AccountDropdown({ className }) {
-  const { currentUser, signInWithGoogle, signOut } = useAuth();
+  const { currentUser, signInWithGoogle, signOut, userData } = useAuth();
   if (currentUser) {
     return (
       <Dropdown className={className}>
         <Dropdown.Toggle as={AccountCircle} />
         <Dropdown.Menu align="right" className="text-center w-sm-100">
           <Dropdown.Header>
-            {currentUser.displayName || currentUser.email}
+            {userData?.displayName || currentUser?.email}
           </Dropdown.Header>
           <Dropdown.Divider />
-          {/* {userDoc && userDoc.data().author && (
-            <Dropdown.Item as={Link} to={routes.article.manage.get()}>
+          {userData?.author && (
+            <Dropdown.Item href="/articles/manage">
               Manage Articles
             </Dropdown.Item>
-          )} */}
+          )}
           {/* <Dropdown.Item as={Link} to={routes.account.get()}>
             Manage Account
           </Dropdown.Item> */}

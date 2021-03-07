@@ -1,6 +1,5 @@
 import { Container } from "react-bootstrap";
 import { newArticles } from "../lib/articles/new-articles";
-import Head from "next/head";
 import ArticleCardDeck from "../components/Article/CardDeck/CardDeck";
 // import ArticleHighlight from "../Article/ArticleHighlight/ArticleHighlight";
 
@@ -18,27 +17,20 @@ export const getStaticProps = async () => {
 
 export default function Index({ recentArticles, popularArticles }) {
   return (
-    <>
-      <Head>
-        <title>
-          Bountiful Finance - Financial News From Independent Authors
-        </title>
-      </Head>
-      <Container>
-        {/* {topArticle && <ArticleHighlight Article={topArticle} />} */}
-        {popularArticles && (
-          <Container>
-            <h3 className="text-center my-4">Popular Articles</h3>
-            {/* <ArticleCardDeck Articles={popularArticles} /> */}
-          </Container>
-        )}
-        {recentArticles && (
-          <Container>
-            <h3 className="text-center my-4">New Articles</h3>
-            <ArticleCardDeck Articles={recentArticles} />
-          </Container>
-        )}
-      </Container>
-    </>
+    <Container>
+      {/* {topArticle && <ArticleHighlight Article={topArticle} />} */}
+      {popularArticles && (
+        <Container>
+          <h3 className="text-center my-4">Popular Articles</h3>
+          {/* <ArticleCardDeck Articles={popularArticles} /> */}
+        </Container>
+      )}
+      {recentArticles && (
+        <Container>
+          <h3 className="text-center my-4">New Articles</h3>
+          <ArticleCardDeck Articles={recentArticles} />
+        </Container>
+      )}
+    </Container>
   );
 }

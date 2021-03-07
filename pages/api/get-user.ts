@@ -4,7 +4,6 @@ import { getUser } from "../../lib/db/queries";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   try {
-    console.log(req.headers.token);
     const user = await auth.verifyIdToken(req.headers.token as string);
     if (user?.uid) {
       const userData = await getUser(user.uid);

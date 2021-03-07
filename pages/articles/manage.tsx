@@ -1,34 +1,32 @@
 import { useState } from "react";
 import { Alert, Button, Card, Form, Row } from "react-bootstrap";
 import Router from "next/router";
+import fetcher from "../../lib/fetcher";
+import { useAuth } from "../../contexts/Auth";
+import { ArticleAttributes } from "../../lib/db/models";
+import { NextApiResponse } from "next";
 
-function manage({ User }) {
-  const [article, setArticle] = useState();
+function manage() {
+  const [article, setArticle] = useState<ArticleAttributes>();
   const [error, setError] = useState("");
+  const { token } = useAuth();
 
   const submit = (e) => {
+    e.preventDefault();
     if (article) {
       setError("");
-      fetch("/api/create-article", {
-        method: "POST",
-        body: JSON.stringify(article),
-      })
+      fetcher("/api/create-article", token, "POST", JSON.stringify(article))
         .then((response) => {
-          response.json().then((body) => {
-            if (!body.success) {
-              setError(
-                body.error?.errors?.map((error) => {
-                  return error.message + " ";
-                })
-              );
-            } else {
-              Router.push(JSON.parse(body.content)?.url || "");
-            }
-          });
+          console.log(response);
+          if (response?.success) {
+            Router.push(JSON.parse(response?.content)?.url || "/");
+          } else {
+            setError("Something went wrong 😕...");
+          }
         })
         .catch((error) => {
-          console.log(error);
-          setError("Could not reach the server!");
+          console.error(error);
+          setError("Couldn't contact the server 😧...");
         });
     }
   };
@@ -99,7 +97,7 @@ function manage({ User }) {
             variant="info"
             onClick={submit}
           >
-            Submit
+            Save
           </Button>
         </Form.Group>
       </Card.Body>

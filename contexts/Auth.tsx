@@ -2,13 +2,14 @@ import { createContext, Context, useContext, useEffect, useState } from "react";
 import { auth } from "../lib/firebase/firebase";
 import firebase from "firebase";
 import fetcher from "../lib/fetcher";
+import { UserAttributes } from "../lib/db/models";
 
 export interface Auth {
   signInWithGoogle: () => Promise<firebase.auth.UserCredential | void>;
   currentUser: firebase.User;
   signOut: () => Promise<void>;
   token: string;
-  userData: {};
+  userData: UserAttributes;
 }
 
 const AuthContext: Context<Auth> = createContext<Auth>({
@@ -45,7 +46,11 @@ export default function AuthProvider({ children }) {
         if (authState) {
           try {
             const token = await authState.getIdToken();
-            const user: JSON = await fetcher("/api/get-user", token, "GET");
+            const user: UserAttributes = await fetcher(
+              "/api/get-user",
+              token,
+              "GET"
+            );
             setAuthValue({
               ...authValue,
               currentUser: authState,

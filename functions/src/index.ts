@@ -10,7 +10,6 @@ import { User } from "../../lib/db/models";
 // });
 
 export const newUser = functions.auth.user().onCreate(async (user, context) => {
-  console.log(user);
   return User.create({
     idUsers: user.uid,
     email: user.email,

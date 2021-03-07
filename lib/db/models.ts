@@ -1,7 +1,15 @@
-import { DataTypes, IntegerDataType, Model, Optional } from "sequelize";
+import {
+  DataTypes,
+  HasManyGetAssociationsMixin,
+  HasOneGetAssociationMixin,
+  IntegerDataType,
+  Model,
+  Optional,
+} from "sequelize";
 import { sequelize } from "./connect";
+import { randomBytes } from "crypto";
 
-interface ArticleAttributes {
+export interface ArticleAttributes {
   idArticles: number;
   body: string;
   publish: boolean;
@@ -16,6 +24,16 @@ interface ArticleCreationAttributes
     "idArticles" | "publish" | "subtitle" | "url"
   > {}
 
+export const createURL = (title: string) => {
+  return (
+    title
+      .replace(/ /g, "-")
+      .replace(/[^a-zA-Z0-9-]/g, "")
+      .slice(0, 50) +
+    "-" +
+    randomBytes(5).toString("hex")
+  );
+};
 export class Article extends Model<
   ArticleAttributes,
   ArticleCreationAttributes
@@ -29,6 +47,8 @@ export class Article extends Model<
 
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
+
+  public author!: HasOneGetAssociationMixin<User>;
 }
 Article.init(
   {
@@ -80,7 +100,7 @@ ArticleReaction.init(
   { sequelize, modelName: "articleReaction" }
 );
 
-interface UserAttributes {
+export interface UserAttributes {
   idUsers: string;
   author: boolean;
   bio: string | null;
@@ -104,6 +124,9 @@ export class User extends Model<UserAttributes, UserCreationAttributes> {
   public email!: string | null;
   public firstName!: string | null;
   public lastName!: string | null;
+
+  public readonly createdAt: Date;
+  public readonly updatedAt: Date;
 }
 User.init(
   {
@@ -150,7 +173,8 @@ User.init(
   { sequelize, modelName: "user" }
 );
 
-// const Author = Article.belongsTo(User, { as: "author" });
+export const Author = Article.belongsTo(User, { as: "author" });
+export const Articles = User.hasMany(Article);
 
 User.sync({ alter: true });
 Article.sync({ alter: true });
