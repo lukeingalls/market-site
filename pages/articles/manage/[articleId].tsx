@@ -37,7 +37,6 @@ function manage() {
         setError("");
         fetcher("/api/create-article", token, "POST", JSON.stringify(article))
           .then((response) => {
-            console.log(response);
             if (response?.success) {
               Router.push({
                 pathname: `/articles/${JSON.parse(response.content)?.url}`,

@@ -49,9 +49,7 @@ export default function AccountDropdown({ className }) {
               Manage Articles
             </Dropdown.Item>
           )}
-          {/* <Dropdown.Item as={Link} to={routes.account.get()}>
-            Manage Account
-          </Dropdown.Item> */}
+          <Dropdown.Item href="/account/manage">Manage Account</Dropdown.Item>
           <Dropdown.Item
             onClick={(e) => {
               e.preventDefault();

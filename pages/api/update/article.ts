@@ -4,7 +4,6 @@ import { Article } from "../../../lib/db/models";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   authRequest(req, res, () => {
-    console.log(req.body);
     Article.update(req.body, {
       where: {
         idArticles: req.body.idArticles,

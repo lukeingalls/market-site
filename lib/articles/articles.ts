@@ -14,7 +14,7 @@ export const getAllPostIds = async () => {
 };
 
 export const getPostData = async (id: string) => {
-  // Change this to be a subquery
+  // TODO: Change this to be a subquery
   const article = await getArticle(id);
   const user = await getUser(article.getDataValue("authorIdUsers"));
 

@@ -12,10 +12,10 @@ if (!firebase.apps.length) {
 
   auth = app.auth();
 
-  if (process.env.NEXT_USE_EMULATOR === "true") {
-    console.log("using auth...");
-    auth.useEmulator("http://localhost:9099");
-  }
+  // if (process.env.NEXT_USE_EMULATOR === "true") {
+  //   console.log("using auth...");
+  //   auth.useEmulator("http://localhost:9099");
+  // }
 }
 
 export { app, auth };

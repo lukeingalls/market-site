@@ -179,9 +179,6 @@ User.init(
     },
     title: {
       type: DataTypes.STRING,
-      validate: {
-        isAlphanumeric: true,
-      },
     },
   },
   { sequelize, modelName: "user" }
@@ -190,5 +187,5 @@ User.init(
 export const Author = Article.belongsTo(User, { as: "author" });
 export const Articles = User.hasMany(Article);
 
-// User.sync({ alter: true });
-// Article.sync({ alter: true });
+// User.sync();
+// Article.sync();
