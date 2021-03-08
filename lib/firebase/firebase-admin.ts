@@ -1,12 +1,11 @@
 import admin from "firebase-admin";
-import * as creds from "../../market-site-dev.json";
 
 if (!admin.apps.length) {
   admin.initializeApp({
     credential: admin.credential.cert({
-      projectId: creds.project_id,
-      privateKey: creds.private_key,
-      clientEmail: creds.client_email,
+      projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+      privateKey: process.env.PRIVATE_KEY.replace(/\\n/g, "\n"),
+      clientEmail: process.env.CLIENT_EMAIL,
     }),
   });
 }
