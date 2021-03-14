@@ -1,10 +1,10 @@
 import { Col, Container, Row } from "react-bootstrap";
 import ArticleCard from "./Card/Card";
 import * as styles from "../../../styles/Article/CardDeck/CardDeck.module.scss";
-import { ArticleAttributes } from "../../../lib/db/models";
+import { Article } from "@prisma/client";
 
 interface ArticleCardDeckProps {
-  Articles: ArticleAttributes[];
+  Articles: Article[];
 }
 
 export default function ArticleCardDeck({ Articles }: ArticleCardDeckProps) {
@@ -14,7 +14,7 @@ export default function ArticleCardDeck({ Articles }: ArticleCardDeckProps) {
         {Articles.map((article) => {
           return (
             <Col
-              key={article["idArticles"]}
+              key={article.id}
               className={`${styles["article-card"]}`}
               xl={4}
               md={6}

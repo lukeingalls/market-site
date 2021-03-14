@@ -2,65 +2,81 @@ import { useEffect, useState } from "react";
 import { Alert, Button, Card, Form, Row } from "react-bootstrap";
 import Router, { useRouter } from "next/router";
 import fetcher from "../../../lib/fetcher";
-import { useAuth } from "../../../contexts/Auth";
-import { ArticleAttributes } from "../../../lib/db/models";
+import { Article } from "@prisma/client";
+import { useSession } from "next-auth/client";
 
 function manage() {
   const router = useRouter();
-  const [article, setArticle] = useState<ArticleAttributes>();
+  const [article, setArticle] = useState<Article>();
+  const [session, loading] = useSession();
   const [error, setError] = useState("");
-  const { token } = useAuth();
   const { articleId } = router.query;
 
   useEffect(() => {
     let mount = true;
-    if (token && articleId) {
+    if (session?.user && articleId) {
       (async () => {
         const resp = await fetcher(
-          "/api/get/article",
-          token,
+          "/api/article/get",
           "POST",
-          JSON.stringify(articleId)
+          JSON.stringify({ id: articleId })
         );
-        setArticle(resp as ArticleAttributes);
+        if (mount) {
+          if (resp.status === 200) {
+            const respArticle = await resp.json();
+            setArticle(respArticle as Article);
+          } else {
+            setError("Couldn't fetch the article 😩");
+          }
+        }
       })();
     }
     return () => {
       mount = false;
     };
-  }, [token, articleId]);
+  }, [session, articleId]);
 
   const submit = (e) => {
+    e.preventDefault();
+    setError("");
     if (articleId === "new") {
-      e.preventDefault();
-      if (article) {
-        setError("");
-        fetcher("/api/create-article", token, "POST", JSON.stringify(article))
-          .then((response) => {
-            if (response?.success) {
-              Router.push({
-                pathname: `/articles/${JSON.parse(response.content)?.url}`,
-              });
-            } else {
+      (async () => {
+        const res = await fetcher(
+          "/api/article/put",
+          "PUT",
+          JSON.stringify(article)
+        );
+        if (res.status === 200) {
+          const retArticle = await res.json();
+          router.push("/articles/" + retArticle.url);
+        } else {
+          switch (res.status) {
+            case 401:
+              setError("You aren't authorized to perform this action 🙃");
+              break;
+            default:
               setError("Something went wrong 😕...");
-            }
-          })
-          .catch((error) => {
-            console.error(error);
-            setError("Couldn't contact the server 😧...");
-          });
-      }
-    } else {
-      fetcher(
-        "/api/update/article",
-        token,
-        "POST",
-        JSON.stringify(article)
-      ).then((response) => {
-        if (response?.success) {
-          setError("Successfully updated article!");
+              break;
+          }
         }
-      });
+      })();
+    } else {
+      (async () => {
+        const res = await fetcher(
+          "/api/article/post",
+          "POST",
+          JSON.stringify(article)
+        );
+        if (res.status === 200) {
+          if (article.published) {
+            router.push("/articles/" + article.url);
+          } else {
+            setError("Your article has been updated 😁");
+          }
+        } else {
+          setError("Couldn't update the article 🤷...");
+        }
+      })();
     }
   };
 
@@ -116,11 +132,11 @@ function manage() {
             type="switch"
             id="form.switch"
             label="Publish article"
-            checked={article?.publish || false}
+            checked={article?.published || false}
             onChange={(e) => {
               setArticle({
                 ...article,
-                publish: e.target.checked,
+                published: e.target.checked,
               });
             }}
           />

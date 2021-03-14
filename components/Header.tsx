@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Button, Form, FormControl, Nav, Navbar } from "react-bootstrap";
 import * as styles from "../styles/header.module.scss";
-import AccountDropdown from "../components/Account/Dropdown.tsx";
+import AccountDropdown from "../components/Account/Dropdown";
 
 export default function Header() {
   return (
@@ -13,7 +13,10 @@ export default function Header() {
       variant="dark"
     >
       <Link href="/">
-        <Navbar.Brand className="text-white" style={{ fontWeight: "bold" }}>
+        <Navbar.Brand
+          className={`${styles["header-brand"]} "text-white"`}
+          style={{ fontWeight: "bold" }}
+        >
           Bountiful Finance
         </Navbar.Brand>
       </Link>

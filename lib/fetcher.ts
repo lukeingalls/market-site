@@ -1,17 +1,14 @@
 const fetcher = async (
-  url: string,
-  token: string,
+  route: string,
   method: string = "GET",
   body?: BodyInit
 ) => {
-  const res = await fetch(url, {
+  const res = await fetch(route, {
     method,
-    headers: new Headers({ "Content-Type": "application/json", token }),
-    credentials: "same-origin",
     body,
   });
 
-  return res.json();
+  return res;
 };
 
 export default fetcher;

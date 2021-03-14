@@ -2,16 +2,16 @@ import { useState } from "react";
 import { Col, Collapse, Container, Row } from "react-bootstrap";
 import * as styles from "../../../styles/Article/Byline.module.scss";
 import { getTimeString } from "../../../lib/time";
-import { UserAttributes } from "../../../lib/db/models";
+import { User } from "@prisma/client";
 
 interface BylineProps {
-  user: UserAttributes;
+  user: User;
   createdAt: string | Date;
 }
 
 export default function Byline({ user, createdAt }: BylineProps) {
   const [open, setOpen] = useState(false);
-  const { displayName, bio, title } = user;
+  const { bio, image, name, title } = user;
   const time = getTimeString(new Date(createdAt));
   return (
     <Container
@@ -24,20 +24,20 @@ export default function Byline({ user, createdAt }: BylineProps) {
       }}
     >
       <Row>
-        {/* {img && (
+        {image && (
           <Col className={`${styles["profile-picture__col"]}`}>
             <img
-              alt={displayName}
+              alt={name}
               className={`${styles["profile-picture"]}`}
-              src={img}
+              src={image}
             />
           </Col>
-        )} */}
+        )}
         <Col>
-          {displayName && (
+          {name && (
             <Row className="mx-0">
               <address className="mb-0">
-                {`${displayName}${title ? `, ${title}` : ""}`}
+                {`${name}${title ? `, ${title}` : ""}`}
               </address>
             </Row>
           )}

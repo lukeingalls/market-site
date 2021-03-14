@@ -2,15 +2,15 @@ import { Button, Card } from "react-bootstrap";
 import * as styles from "../../../../styles/Article/CardDeck/Card/Card.module.scss";
 import ReactMarkdown from "react-markdown";
 import { getTimeString } from "../../../../lib/time";
-import { ArticleAttributes } from "../../../../lib/db/models";
+import { Article } from "@prisma/client";
+import gfm from "remark-gfm";
 
 interface ArticleCardProps {
-  article: ArticleAttributes;
+  article: Article;
 }
 
 export default function ArticleCard({ article }: ArticleCardProps) {
-  // const timeString = getTimeString(article.createdAt);
-  const timeString = getTimeString(new Date());
+  const timeString = getTimeString(article.createdAt);
 
   return (
     <Card>
@@ -28,12 +28,13 @@ export default function ArticleCard({ article }: ArticleCardProps) {
         <Card.Text
           children={article.body.slice(0, 400)}
           as={ReactMarkdown}
+          plugins={[gfm]}
           className={`mt-3 ${styles["article-card__text"]}`}
         />
       </Card.Body>
       <Card.Footer className={`${styles["article-card__footer"]}`}>
         <p className="text-muted">Posted {timeString}</p>
-        <Button href={`articles/${article["url"]}`} variant="outline-info">
+        <Button href={`articles/${article.url}`} variant="outline-info">
           Read More
         </Button>
       </Card.Footer>

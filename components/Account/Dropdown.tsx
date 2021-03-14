@@ -1,11 +1,9 @@
 import { forwardRef, LegacyRef } from "react";
 import { Button, Dropdown } from "react-bootstrap";
-import Link from "next/link";
-import { useAuth } from "../../contexts/Auth";
 import * as btnStyles from "../../styles/btn-block.module.scss";
 import * as styles from "../../styles/Account/Dropdown.module.scss";
 import { PersonCircle } from "react-bootstrap-icons";
-
+import { signIn, signOut, useSession } from "next-auth/client";
 interface AccountCircleProps {
   onClick: (e: MouseEvent) => void;
 }
@@ -34,17 +32,17 @@ const AccountCircle = forwardRef(
 );
 
 export default function AccountDropdown({ className }) {
-  const { currentUser, signInWithGoogle, signOut, userData } = useAuth();
-  if (currentUser) {
+  const [session, loading] = useSession();
+  if (session?.user) {
+    //@ts-ignore
+    const { author, email, name } = session.user;
     return (
       <Dropdown className={className}>
         <Dropdown.Toggle as={AccountCircle} />
         <Dropdown.Menu align="right" className="text-center w-sm-100">
-          <Dropdown.Header>
-            {userData?.displayName || currentUser?.email}
-          </Dropdown.Header>
+          <Dropdown.Header>{name || email}</Dropdown.Header>
           <Dropdown.Divider />
-          {userData?.author && (
+          {author && (
             <Dropdown.Item href="/articles/my-articles">
               Manage Articles
             </Dropdown.Item>
@@ -65,7 +63,9 @@ export default function AccountDropdown({ className }) {
     return (
       <Button
         className={`${className} ${btnStyles["btn-sm-block"]}`}
-        onClick={signInWithGoogle}
+        onClick={() => {
+          signIn("google");
+        }}
         variant="outline-light"
       >
         Sign In

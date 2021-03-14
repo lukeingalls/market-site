@@ -1,11 +1,12 @@
+import { User } from "@prisma/client";
+import { useSession } from "next-auth/client";
 import { useEffect, useState } from "react";
 import { Alert, Button, Container, Form } from "react-bootstrap";
-import { useAuth } from "../../contexts/Auth";
 import fetcher from "../../lib/fetcher";
 
 const manage = () => {
-  const { userData, token } = useAuth();
-  const [user, setUser] = useState(userData);
+  const [session, loading] = useSession();
+  const [user, setUser] = useState<User>(session?.user as User);
   const [message, setMessage] = useState("");
 
   const submit = async (e) => {
@@ -13,25 +14,23 @@ const manage = () => {
     e.preventDefault();
     try {
       const resp = await fetcher(
-        "/api/update/user",
-        token,
+        "/api/account/post",
         "POST",
         JSON.stringify(user)
       );
-      if (resp.success) {
+      if (resp.status === 200) {
         setMessage("Your profile is updated ✅");
       } else {
         setMessage("Something went wrong 😔");
       }
     } catch (error) {
-      setMessage("Couldn't contact the server");
-      console.error(error);
+      setMessage("Couldn't contact the server 😮");
     }
   };
 
   useEffect(() => {
-    setUser(userData);
-  }, [userData]);
+    setUser(session?.user as User);
+  }, [session]);
 
   return (
     <Container className="pt-4">
@@ -46,11 +45,11 @@ const manage = () => {
           <Form.Control
             type="text"
             placeholder="Create display name"
-            value={user?.displayName || ""}
+            value={user?.name || ""}
             onChange={(e) => {
               setUser({
                 ...user,
-                displayName: e.target.value,
+                name: e.target.value,
               });
             }}
           />
@@ -88,7 +87,7 @@ const manage = () => {
           </>
         ) : (
           <Alert variant="info">
-            Authors get more settings. Checkback to see if you are eligible.{" "}
+            Authors get more settings. Checkback to see if you are eligible.
           </Alert>
         )}
         <Button variant="info" type="submit">

@@ -3,3 +3,7 @@ $header-height: 64px;
 .header-height {
   height: $header-height;
 }
+
+.header-brand {
+  cursor: pointer;
+}

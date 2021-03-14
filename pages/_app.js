@@ -1,9 +1,9 @@
-import Header from "../components/Header";
+import Header from "../components/Header.tsx";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Container } from "react-bootstrap";
 import * as styles from "../styles/_app.module.scss";
-import AuthProvider from "../contexts/Auth.tsx";
 import Head from "next/head";
+import { Provider } from "next-auth/client";
 
 function MyApp({ Component, pageProps }) {
   return (
@@ -13,14 +13,14 @@ function MyApp({ Component, pageProps }) {
           Bountiful Finance - Financial News From Independent Authors
         </title>
       </Head>
-      <AuthProvider>
+      <Provider session={pageProps.session}>
         <div className="bg-light">
           <Header />
           <Container className={`border bg-white ${styles["app-content"]}`}>
             <Component {...pageProps} />
           </Container>
         </div>
-      </AuthProvider>
+      </Provider>
     </>
   );
 }

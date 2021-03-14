@@ -1,8 +1,8 @@
+import { Article } from "@prisma/client";
+import { useSession } from "next-auth/client";
 import { useEffect, useState } from "react";
 import { Alert, Button, Col, Container, Row } from "react-bootstrap";
 import Loading from "../../components/Loading";
-import { useAuth } from "../../contexts/Auth";
-import { ArticleAttributes } from "../../lib/db/models";
 import fetcher from "../../lib/fetcher";
 import * as styles from "../../styles/Article/my-article.module.scss";
 
@@ -10,26 +10,30 @@ interface MyArticlesProps {
   className?: string;
 }
 
+// TODO: Requests
+
 const MyArticles = ({ className }: MyArticlesProps) => {
-  const [articles, setArticles] = useState<ArticleAttributes[]>([]);
-  const [loading, setLoading] = useState<Boolean>(true);
-  const { token } = useAuth();
+  const [articles, setArticles] = useState<Article[]>([]);
+  const [session, loading] = useSession();
 
   useEffect(() => {
     let mount = true;
-    if (token) {
+    if (session?.user) {
       (async () => {
-        const resp = await fetcher("/api/get-my-articles", token);
-        if (mount && Array.isArray(resp)) {
-          setArticles(resp);
-          setLoading(false);
+        const resp = await fetcher("/api/article/my-articles/get");
+        if (resp.status === 200) {
+          if (mount) {
+            setArticles(await resp.json());
+          }
         }
       })();
+    } else {
+      setArticles([]);
     }
     return () => {
       mount = false;
     };
-  }, [token]);
+  }, [session]);
 
   if (loading) {
     return <Loading />;
@@ -51,7 +55,7 @@ const MyArticles = ({ className }: MyArticlesProps) => {
             return (
               <Row
                 className={`${styles["manage-article"]} border`}
-                key={article.idArticles}
+                key={article.id}
               >
                 <Col className={`${styles["manage-article--title"]}`}>
                   {article.title}
@@ -61,7 +65,7 @@ const MyArticles = ({ className }: MyArticlesProps) => {
                     {`Views $`}
                   </span> */}
                   <Button
-                    href={`/articles/manage/${article.idArticles}`}
+                    href={`/articles/manage/${article.id}`}
                     variant="info"
                   >
                     Edit

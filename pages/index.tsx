@@ -1,16 +1,16 @@
 import { Container } from "react-bootstrap";
 import { newArticles } from "../lib/articles/new-articles";
 import ArticleCardDeck from "../components/Article/CardDeck/CardDeck";
-import { ArticleAttributes } from "../lib/db/models";
+import { Article } from "@prisma/client";
 // import ArticleHighlight from "../Article/ArticleHighlight/ArticleHighlight";
 
 interface IndexProps {
-  recentArticles: ArticleAttributes[];
-  popularArticles: ArticleAttributes[];
+  recentArticles: Article[];
+  popularArticles: Article[];
 }
 
 export const getStaticProps = async () => {
-  const recentArticles: ArticleAttributes[] = await newArticles();
+  const recentArticles: Article[] = await newArticles();
 
   return {
     props: {

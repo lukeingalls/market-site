@@ -5,7 +5,8 @@ import Reactions from "../../components/Article/Reactions/Reactions";
 import Byline from "../../components/Article/Byline/Byline";
 import { getAllPostIds, getPostData } from "../../lib/articles/articles";
 import Head from "next/head";
-import { ArticleAttributes, UserAttributes } from "../../lib/db/models";
+import { Article, User } from "@prisma/client";
+import gfm from "remark-gfm";
 
 export const getStaticPaths = async () => {
   try {
@@ -13,7 +14,7 @@ export const getStaticPaths = async () => {
 
     return {
       paths,
-      fallback: false,
+      fallback: true,
     };
   } catch (error) {
     return {
@@ -28,18 +29,23 @@ export const getStaticProps = async ({ params }) => {
   return {
     props: {
       article: postData.article,
-      user: postData.user,
+      user: postData.article.author,
     },
   };
 };
 
 interface ArticleProps {
-  article: ArticleAttributes;
-  user: UserAttributes;
+  article: Article;
+  user: User;
 }
 
-const Article = ({ article, user }: ArticleProps) => {
-  const { title, subtitle, body } = article;
+const ArticleComponent = ({ article, user }: ArticleProps) => {
+  const { title, subtitle, body } = article || {
+    title: "ERROR: title not found",
+    subtitle: undefined,
+    body: "ERROR: article was not retrieved",
+  };
+
   return (
     <>
       <Head>
@@ -64,7 +70,7 @@ const Article = ({ article, user }: ArticleProps) => {
             {subtitle && <h2 className="article--subtitle"> {subtitle}</h2>}
 
             {user && <Byline user={user} createdAt={article.createdAt} />}
-            <ReactMarkdown children={body} />
+            <ReactMarkdown plugins={[gfm]}>{body}</ReactMarkdown>
           </Col>
           <Col
             md={{
@@ -80,4 +86,4 @@ const Article = ({ article, user }: ArticleProps) => {
   );
 };
 
-export default Article;
+export default ArticleComponent;
