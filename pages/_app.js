@@ -23,7 +23,7 @@ function MyApp({ Component, pageProps }) {
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
 
-            gtag('config', ${process.env.GOOGLE_ANALYTICS});`,
+            gtag('config', 'G-H1LCNW2L75');`,
           }}
         />
       </Head>
