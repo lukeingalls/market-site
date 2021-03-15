@@ -14,7 +14,7 @@ function manage() {
 
   useEffect(() => {
     let mount = true;
-    if (session?.user && articleId) {
+    if (session?.user && articleId && articleId !== "new") {
       (async () => {
         const resp = await fetcher(
           "/api/article/get",

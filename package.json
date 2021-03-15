@@ -1,13 +1,16 @@
 {
   "name": "market-site",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "schema": "prisma generate",
-    "prisma": "prisma studio"
+    "prisma": "dotenv -e .env.local -- prisma studio",
+    "prisma:prod": "dotenv -e .env.prod -- prisma studio",
+    "dbsync": "dotenv -e .env.local -- prisma db push --preview-feature",
+    "dbsync:prod": "dotenv -e .env.prod -- prisma db push --preview-feature"
   },
   "dependencies": {
     "@prisma/client": "^2.18.0",
@@ -27,6 +30,8 @@
   },
   "devDependencies": {
     "@types/next-auth": "^3.7.1",
+    "dotenv": "^8.2.0",
+    "dotenv-cli": "^4.0.0",
     "prisma": "^2.18.0",
     "typescript": "^4.2.3"
   }
