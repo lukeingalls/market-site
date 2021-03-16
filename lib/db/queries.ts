@@ -1,7 +1,6 @@
-import { Article, PrismaClient, User } from "@prisma/client";
+import { Article, User } from "@prisma/client";
 import { randomBytes } from "crypto";
-
-const prisma = new PrismaClient();
+import prisma from "./prisma";
 
 const createURL = (title: string) => {
   return (
@@ -68,12 +67,67 @@ export async function getNewPublishedArticles(limit: number = 5) {
   });
 }
 
+export async function getArticleReactions(id: number) {
+  return await prisma.reaction.groupBy({
+    by: ["type"],
+    where: {
+      articleId: id,
+    },
+    count: {
+      _all: true,
+    },
+  });
+}
+
+export async function getMyReaction(userId: number, articleId: number) {
+  return await prisma.reaction.findFirst({
+    select: {
+      type: true,
+    },
+    where: {
+      userId: userId,
+      articleId: articleId,
+    },
+  });
+}
+
+export function getViews(articleId: number) {
+  return prisma.view.aggregate({
+    count: {
+      _all: true,
+    },
+    where: {
+      articleId,
+    },
+  });
+}
+
 export async function putArticle(article: Article, user: User) {
   return await prisma.article.create({
     data: {
       ...article,
       url: createURL(article.title),
       authorId: user.id,
+    },
+  });
+}
+
+export async function putView(ip: string, articleId: number) {
+  return await prisma.view.upsert({
+    create: {
+      ip,
+      articleId,
+    },
+    update: {
+      count: {
+        increment: 1,
+      },
+    },
+    where: {
+      ip_articleId: {
+        articleId,
+        ip,
+      },
     },
   });
 }
@@ -96,6 +150,29 @@ export async function postUser(user: User) {
     },
     data: {
       ...user,
+    },
+  });
+}
+
+export async function postReaction(
+  type: string,
+  articleId: number,
+  userId: number
+) {
+  return await prisma.reaction.upsert({
+    create: {
+      type,
+      articleId,
+      userId,
+    },
+    update: {
+      type,
+    },
+    where: {
+      articleId_userId: {
+        articleId,
+        userId,
+      },
     },
   });
 }
