@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["groupBy"]
 }
 
 datasource db {
@@ -28,16 +29,18 @@ model Account {
 }
 
 model Article {
-  id        Int      @id @default(autoincrement())
-  title     String   @db.VarChar(255)
-  subtitle  String?  @db.VarChar(255)
+  id        Int        @id @default(autoincrement())
+  title     String     @db.VarChar(255)
+  subtitle  String?    @db.VarChar(255)
   body      String
-  published Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-  url       String   @db.VarChar(75)
-  author    User     @relation(fields: [authorId], references: [id])
+  published Boolean    @default(false)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @default(now())
+  url       String     @db.VarChar(75)
+  author    User       @relation(fields: [authorId], references: [id])
   authorId  Int
+  views     View[]
+  reactions Reaction[]
 
   @@map(name: "articles")
 }
@@ -55,21 +58,44 @@ model Session {
 }
 
 model User {
-  id            Int       @id @default(autoincrement())
-  firstName     String?   @db.VarChar(45)
-  lastName      String?   @db.VarChar(45)
-  name          String?   @db.VarChar(255)
-  title         String?   @db.VarChar(255)
-  bio           String?   @db.VarChar(255)
-  email         String    @unique @db.VarChar(255)
-  emailVerified DateTime? @map(name: "email_verified")
+  id            Int        @id @default(autoincrement())
+  firstName     String?    @db.VarChar(45)
+  lastName      String?    @db.VarChar(45)
+  name          String?    @db.VarChar(255)
+  title         String?    @db.VarChar(255)
+  bio           String?    @db.VarChar(255)
+  email         String     @unique @db.VarChar(255)
+  emailVerified DateTime?  @map(name: "email_verified")
   image         String?
-  author        Boolean   @default(false)
-  createdAt     DateTime  @default(now()) @map(name: "created_at")
-  updatedAt     DateTime  @default(now()) @map(name: "updated_at")
+  author        Boolean    @default(false)
+  createdAt     DateTime   @default(now()) @map(name: "created_at")
+  updatedAt     DateTime   @default(now()) @map(name: "updated_at")
   articles      Article[]
+  reactions     Reaction[]
 
   @@map(name: "users")
+}
+
+model View {
+  ip        String  @unique @db.VarChar(15)
+  article   Article @relation(fields: [articleId], references: [id])
+  articleId Int
+  count     Int     @default(1)
+
+  @@id([ip, articleId])
+  @@map(name: "views")
+}
+
+model Reaction {
+  type      String  @db.VarChar(10)
+  article   Article @relation(fields: [articleId], references: [id])
+  articleId Int
+  user      User    @relation(fields: [userId], references: [id])
+  userId    Int
+
+
+  @@id([articleId, userId])
+  @@map(name: "reactions")
 }
 
 model VerificationRequest {
