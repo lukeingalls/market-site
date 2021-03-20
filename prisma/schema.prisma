@@ -45,6 +45,18 @@ model Article {
   @@map(name: "articles")
 }
 
+model Reaction {
+  type      String  @db.VarChar(10)
+  article   Article @relation(fields: [articleId], references: [id])
+  articleId Int
+  user      User    @relation(fields: [userId], references: [id])
+  userId    Int
+
+
+  @@id([articleId, userId])
+  @@map(name: "reactions")
+}
+
 model Session {
   id           Int      @id @default(autoincrement())
   userId       Int      @map(name: "user_id")
@@ -76,28 +88,6 @@ model User {
   @@map(name: "users")
 }
 
-model View {
-  ip        String  @unique @db.VarChar(15)
-  article   Article @relation(fields: [articleId], references: [id])
-  articleId Int
-  count     Int     @default(1)
-
-  @@id([ip, articleId])
-  @@map(name: "views")
-}
-
-model Reaction {
-  type      String  @db.VarChar(10)
-  article   Article @relation(fields: [articleId], references: [id])
-  articleId Int
-  user      User    @relation(fields: [userId], references: [id])
-  userId    Int
-
-
-  @@id([articleId, userId])
-  @@map(name: "reactions")
-}
-
 model VerificationRequest {
   id         Int      @id @default(autoincrement())
   identifier String
@@ -107,4 +97,14 @@ model VerificationRequest {
   updatedAt  DateTime @default(now()) @map(name: "updated_at")
 
   @@map(name: "verification_requests")
+}
+
+model View {
+  ip        String  @unique @db.VarChar(15)
+  article   Article @relation(fields: [articleId], references: [id])
+  articleId Int
+  count     Int     @default(1)
+
+  @@id([ip, articleId])
+  @@map(name: "views")
 }
