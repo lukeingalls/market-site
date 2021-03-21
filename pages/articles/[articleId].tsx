@@ -5,11 +5,12 @@ import Reactions from "../../components/Article/Reactions/Reactions";
 import Byline from "../../components/Article/Byline/Byline";
 import { getAllPostIds, getPostData } from "../../lib/articles/articles";
 import Head from "next/head";
-import { Article, User } from "@prisma/client";
+import { Article, Category, User } from "@prisma/client";
 import gfm from "remark-gfm";
 import { useEffect, useState } from "react";
 import fetcher from "../../lib/fetcher";
 import useSWR from "swr";
+import CategoryComponent from "../../components/Category/Category";
 
 export const getStaticPaths = async () => {
   try {
@@ -33,6 +34,7 @@ export const getStaticProps = async ({ params }) => {
     props: {
       article: postData.article,
       user: postData.article.author,
+      categories: postData.categories,
     },
   };
 };
@@ -47,6 +49,7 @@ export interface ReactionCount {
 interface ArticleProps {
   article: Article;
   user: User;
+  categories: Category[];
 }
 
 interface Data {
@@ -55,7 +58,7 @@ interface Data {
   myReaction: string;
 }
 
-const ArticleComponent = ({ article, user }: ArticleProps) => {
+const ArticleComponent = ({ article, user, categories }: ArticleProps) => {
   const { data } = useSWR(`/api/reactions/${article?.id}`, fetcher);
   const { title, subtitle, body } = article || {
     title: "Bountiful Finance Article",
@@ -131,10 +134,13 @@ const ArticleComponent = ({ article, user }: ArticleProps) => {
               loading={loading}
               reactionCount={parsedData?.reactions}
               reaction={reaction}
-              setReaction={(reaction) => {
+              setReaction={(reaction: string) => {
                 setReaction(reaction);
               }}
             />
+            {categories && (
+              <CategoryComponent categories={categories} className="mt-3" />
+            )}
           </Col>
           <Col md="9" xs="12">
             <h1 className="article--title"> {title} </h1>

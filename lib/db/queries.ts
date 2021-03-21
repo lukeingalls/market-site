@@ -47,6 +47,22 @@ export async function getArticleById(id: number) {
   });
 }
 
+export async function getArticleCategories(url: string) {
+  return prisma.category.findMany({
+    select: {
+      emoji: true,
+      label: true,
+    },
+    where: {
+      articles: {
+        every: {
+          url,
+        },
+      },
+    },
+  });
+}
+
 export async function getAllPublishedArticles() {
   return await prisma.article.findMany({
     select: {
@@ -55,6 +71,12 @@ export async function getAllPublishedArticles() {
     where: {
       published: true,
     },
+  });
+}
+
+export async function getCategories(limit: number = 10) {
+  return await prisma.category.findMany({
+    take: limit,
   });
 }
 
@@ -67,7 +89,7 @@ export async function getNewPublishedArticles(limit: number = 5) {
   });
 }
 
-export async function getArticleReactions(id: number) {
+export async function getArticleReactionCount(id: number) {
   return await prisma.reaction.groupBy({
     by: ["type"],
     where: {

@@ -1,41 +1,64 @@
 import { Container, Row, Spinner } from "react-bootstrap";
-import { HandThumbsDownFill, HandThumbsUpFill } from "react-bootstrap-icons";
+import {
+  HandThumbsDownFill,
+  HandThumbsUpFill,
+  Icon,
+} from "react-bootstrap-icons";
 import { ReactionCount } from "../../../pages/articles/[articleId]";
 import * as styles from "../../../styles/Article/Reactions.module.scss";
 
+type reactionFunction = (value: string) => void;
+
+interface ReactionData {
+  className: string;
+  Component: Icon;
+  reaction: string;
+}
+
 interface ReactionsProp {
   className?: string;
-  loading: Boolean;
+  loading: boolean;
   reactionCount: ReactionCount[];
   reaction?: string;
-  setReaction: Function;
+  setReaction: reactionFunction;
 }
 
 interface ReactionProp {
-  active: boolean;
-  className?: string;
-  Component: any; // TODO: change type
+  isActive: boolean;
   count: number;
-  reaction: string;
-  setReaction: any; // TODO: change type
+  reaction: ReactionData;
+  setReaction: reactionFunction;
 }
 
+const REACTIONSLIST: ReactionData[] = [
+  {
+    reaction: "like",
+    Component: HandThumbsUpFill,
+    className: styles["reaction--info"],
+  },
+  {
+    reaction: "dislike",
+    Component: HandThumbsDownFill,
+    className: styles["reaction--danger"],
+  },
+];
+
 const Reaction = ({
-  active,
-  className,
-  Component,
+  isActive,
   count = 0,
   reaction,
   setReaction,
 }: ReactionProp) => {
   const onReaction = () => {
-    setReaction(active ? "" : reaction);
+    setReaction(isActive ? "" : reaction.reaction);
   };
 
   return (
     <span className="d-flex flex-column text-center">
-      <Component
-        className={`${active ? className : ""} ${styles["reaction"]}`}
+      <reaction.Component
+        className={`${isActive ? reaction.className : ""} ${
+          styles["reaction"]
+        }`}
         onClick={onReaction}
       />
       {count}
@@ -50,19 +73,6 @@ export default function Reactions({
   reaction,
   setReaction,
 }: ReactionsProp) {
-  const reactionsList = [
-    {
-      reaction: "like",
-      Component: HandThumbsUpFill,
-      className: styles["reaction--info"],
-    },
-    {
-      reaction: "dislike",
-      Component: HandThumbsDownFill,
-      className: styles["reaction--danger"],
-    },
-  ];
-
   return (
     <Container
       className={`${styles["reaction__container"]} border ${className || ""}`}
@@ -72,7 +82,7 @@ export default function Reactions({
         <Spinner animation="grow" />
       ) : (
         <Row className={`${styles["reaction__button-group"]}`}>
-          {reactionsList.map((r) => {
+          {REACTIONSLIST.map((r) => {
             const count =
               reactionCount?.find((rc) => {
                 return r.reaction === rc.type;
@@ -80,11 +90,9 @@ export default function Reactions({
             return (
               <Reaction
                 key={r.reaction}
-                active={reaction === r.reaction}
-                className={r.className}
-                Component={r.Component}
+                isActive={reaction === r.reaction}
                 count={count}
-                reaction={r.reaction}
+                reaction={r}
                 setReaction={setReaction}
               />
             );

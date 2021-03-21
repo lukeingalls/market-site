@@ -2,7 +2,7 @@ import { User } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 import { getSession } from "next-auth/client";
 import {
-  getArticleReactions,
+  getArticleReactionCount,
   getMyReaction,
   getViews,
   putView,
@@ -16,7 +16,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function
     // Concurrent async operations see link above
     let reqs: Array<Promise<any>> = [
-      (async () => getArticleReactions(id))(),
+      (async () => getArticleReactionCount(id))(),
       (async () => getViews(id))(),
       (async () => putView(address, id))(),
     ];

@@ -1,4 +1,8 @@
-import { getAllPublishedArticles, getArticle } from "../db/queries";
+import {
+  getAllPublishedArticles,
+  getArticle,
+  getArticleCategories,
+} from "../db/queries";
 
 export const getAllPostIds = async () => {
   const articles = await getAllPublishedArticles();
@@ -14,10 +18,10 @@ export const getAllPostIds = async () => {
 
 export const getPostData = async (id: string) => {
   const article = await getArticle(id);
+  const categories = await getArticleCategories(id);
 
   return {
-    article: {
-      ...article,
-    },
+    article,
+    categories,
   };
 };
